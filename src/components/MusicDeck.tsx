@@ -190,7 +190,7 @@ function ModeCard({
           onClick={onReroll}
           disabled={!active}
           tabIndex={active ? 0 : -1}
-          className="hand shrink-0 text-[0.8rem] underline-offset-4 hover:underline"
+          className="hand tap shrink-0 text-[0.8rem] underline-offset-4 hover:underline"
           style={{ color: "var(--accent-text)" }}
           title="New key, new progression, no gap"
         >

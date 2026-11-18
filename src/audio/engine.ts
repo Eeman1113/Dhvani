@@ -38,6 +38,11 @@ let freqData: Uint8Array<ArrayBuffer> | null = null;
 /** Mutated in place every frame; read by the visual layer. Never replaced. */
 export const levels: Levels = { bass: 0, mid: 0, air: 0, rms: 0, hit: 0 };
 
+/** True when the browser has suspended playback out from under us. */
+export function isSuspended() {
+  return ctx !== null && ctx.state === "suspended";
+}
+
 /** Idempotent. Safe to call from any user gesture. */
 export function getContext(): AudioContext {
   if (ctx) return ctx;
@@ -87,8 +92,44 @@ export function getMaster(): GainNode {
   return master!;
 }
 
+/**
+ * Keeps the context alive across the things a phone does to it.
+ *
+ * iOS suspends an AudioContext when the tab is backgrounded, when the screen
+ * locks, and after an interruption such as a call or another app taking the
+ * audio session. Nothing resumes it automatically, so a four hour session
+ * ends silently the first time the user locks their phone, and comes back to
+ * a page that looks like it is playing and is not.
+ *
+ * Resuming needs no gesture once the context has been started once, so
+ * listening for the moments it can happen is enough.
+ */
+let watching = false;
+
+function watchForSuspension() {
+  if (watching || typeof document === "undefined") return;
+  watching = true;
+
+  const tryResume = () => {
+    if (ctx && ctx.state === "suspended") void ctx.resume().catch(() => {});
+  };
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") tryResume();
+  });
+  window.addEventListener("pageshow", tryResume);
+  window.addEventListener("focus", tryResume);
+  // Safari fires this on the context itself when the session is interrupted.
+  ctx?.addEventListener("statechange", () => {
+    if (ctx?.state === "suspended" && document.visibilityState === "visible") {
+      tryResume();
+    }
+  });
+}
+
 export async function resume() {
   const c = getContext();
+  watchForSuspension();
   if (c.state !== "running") {
     try {
       await c.resume();

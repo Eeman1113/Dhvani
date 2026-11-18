@@ -253,6 +253,21 @@ button { cursor: pointer; }
 }
 
 /*
+ * The fader's hit area.
+ *
+ * 26 px is already a comfortable mouse target and keeps a sound card compact.
+ * A thumb is not a mouse, so on a touch screen it opens up to 38, which is
+ * the difference between nudging a level and fighting it.
+ */
+.ink-fader { height: 26px; }
+.ink-thumb { height: 20px; width: 20px; }
+
+@media (pointer: coarse) {
+  .ink-fader { height: 38px; }
+  .ink-thumb { height: 24px; width: 24px; }
+}
+
+/*
  * The real range input that sits invisibly over every drawn fader. It keeps
  * the full native interaction model; the drawing underneath is what you see.
  */
@@ -280,4 +295,70 @@ input[type="range"].bare-range::-moz-range-thumb {
 input[type="range"].bare-range:focus-visible {
   outline: 2.5px dashed var(--focus);
   outline-offset: 2px;
+}
+
+/* ------------------------------------------------------------------ */
+/* touch                                                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * Comfortable targets.
+ *
+ * WCAG 2.2 asks for 24 by 24; a thumb on a phone wants more like 44. These
+ * grow the hit area without growing the visible element, so a 20 px text link
+ * stays a 20 px text link and still catches a thumb.
+ */
+/*
+ * Deliberately no `position` here. These are plain CSS and therefore outside
+ * Tailwind's layers, so declaring position would beat an `absolute` utility
+ * on the same element. It did, once, and moved every card's help button from
+ * the top corner to the middle of the card.
+ */
+.tap {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+.tap-sq {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (pointer: fine) {
+  /* A mouse does not need the padding, and on a dense desktop bar it would
+     push everything apart for no reason. */
+  .tap { min-height: 32px; }
+  .tap-sq { min-width: 32px; min-height: 32px; }
+}
+
+html {
+  /* Kills the 300 ms double-tap delay without disabling pinch zoom. */
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+}
+
+button, a, [role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Repeatedly tapping a card should not start selecting its label. */
+button, [aria-pressed] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+body {
+  /* Notched phones, and the home indicator at the bottom. */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Give the sticky bar somewhere to land when jumping to a section. */
+html { scroll-padding-top: 5rem; }
+
+@supports (height: 100dvh) {
+  /* dvh accounts for mobile browser chrome appearing and disappearing. */
+  .min-h-screen-d { min-height: 100dvh; }
 }

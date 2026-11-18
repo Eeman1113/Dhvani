@@ -48,7 +48,7 @@ export function Presets() {
         <button
           type="button"
           onClick={() => setShowAll((v) => !v)}
-          className="hand text-[0.88rem] underline-offset-4 hover:underline"
+          className="hand tap text-[0.88rem] underline-offset-4 hover:underline"
           style={{ color: "var(--accent-text)" }}
           aria-expanded={showAll}
           aria-controls="more-presets"

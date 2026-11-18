@@ -8,17 +8,54 @@ import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
 import { THEMES } from "@/lib/themes";
 
+/**
+ * The top bar.
+ *
+ * Mobile first, because this is sticky and a phone screen is mostly vertical:
+ * an earlier version simply let the desktop row wrap, which produced four
+ * stacked lines and ate a fifth of an 844 px screen permanently.
+ *
+ * What stays visible on a phone is what gets used constantly, which is the
+ * master fader and a way to stop. Papers, the sleep timer and the credits link
+ * move into a sheet behind one button, and come back inline from `sm` up.
+ */
+
 const TIMER_OPTIONS = [25, 50, 90, 180, 480];
 
-function Timer() {
+function useDismiss(open: boolean, close: () => void, refs: React.RefObject<HTMLElement | null>[]) {
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    const onDown = (e: PointerEvent) => {
+      if (!refs.some((r) => r.current?.contains(e.target as Node))) close();
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+    // refs is a stable array of stable refs
+  }, [open, close, refs]);
+}
+
+function timerLabel(ms: number | null) {
+  if (ms === null) return "timer";
+  const v = Math.max(0, ms);
+  if (v >= 3600000) return `${Math.floor(v / 3600000)}h ${Math.floor((v % 3600000) / 60000)}m`;
+  if (v >= 60000) return `${Math.floor(v / 60000)}m`;
+  return `${Math.ceil(v / 1000)}s`;
+}
+
+/** Shared by the desktop popover and the mobile sheet. */
+function useTimer() {
   const timerEndsAt = useDhvani((s) => s.timerEndsAt);
   const setTimer = useDhvani((s) => s.setTimer);
   const clear = useDhvani((s) => s.clear);
-  const [open, setOpen] = useState(false);
   const [left, setLeft] = useState<number | null>(null);
   const fired = useRef(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const popRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!timerEndsAt) {
@@ -42,58 +79,108 @@ function Timer() {
     };
   }, [timerEndsAt, clear, setTimer]);
 
-  // Clamped: tick() sets the value before the <= 0 branch clears it, so an
-  // unclamped render could flash "-1h 0m" on the way out.
-  const ms = left === null ? null : Math.max(0, left);
-  const label =
-    ms === null
-      ? "timer"
-      : ms >= 3600000
-        ? `${Math.floor(ms / 3600000)}h ${Math.floor((ms % 3600000) / 60000)}m`
-        : ms >= 60000
-          ? `${Math.floor(ms / 60000)}m`
-          : `${Math.ceil(ms / 1000)}s`;
+  return { left, setTimer, running: timerEndsAt !== null };
+}
 
+function TimerOptions({ onPick }: { onPick: (m: number | null) => void }) {
+  return (
+    <>
+      {TIMER_OPTIONS.map((m) => (
+        <button
+          key={m}
+          type="button"
+          role="menuitem"
+          onClick={() => onPick(m)}
+          className="tap relative z-10 rounded-lg px-3 text-left text-sm transition-colors hover:bg-[var(--paper-3)]"
+          style={{ color: "var(--ink)" }}
+        >
+          <span className="hand">
+            {m < 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? "s" : ""}`}
+          </span>
+        </button>
+      ))}
+      <button
+        type="button"
+        role="menuitem"
+        onClick={() => onPick(null)}
+        className="tap relative z-10 rounded-lg px-3 text-left text-sm transition-colors hover:bg-[var(--paper-3)]"
+        style={{ color: "var(--ink-soft)" }}
+      >
+        <span className="hand">no end</span>
+      </button>
+    </>
+  );
+}
+
+function Swatches({ size = 28 }: { size?: number }) {
+  const theme = useDhvani((s) => s.theme);
+  const setTheme = useDhvani((s) => s.setTheme);
+  return (
+    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Paper">
+      {THEMES.map((t) => {
+        const on = t.id === theme;
+        return (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTheme(t.id)}
+            title={`${t.name} ${t.jp}, ${t.mood}`}
+            aria-label={`${t.name} theme`}
+            aria-pressed={on}
+            className="tap-sq relative transition-transform duration-200 hover:scale-110"
+            style={{ width: size, height: size, transform: on ? "scale(1.14)" : undefined }}
+          >
+            <svg viewBox="0 0 28 28" className="h-full w-full overflow-visible">
+              <RoughCircle
+                cx={14} cy={14} r={11}
+                seedKey={`sw-${t.id}`}
+                stroke={on ? t.colors.accent : t.colors.line}
+                fill={t.colors.paper}
+                strokeWidth={on ? 2.4 : 1.8}
+                amp={1}
+              />
+              <RoughCircle
+                cx={14} cy={14} r={5.5}
+                seedKey={`swi-${t.id}`}
+                stroke="none" fill={t.colors.accent} strokeWidth={0}
+                amp={0.9} opacity={on ? 1 : 0.55}
+              />
+            </svg>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function DesktopTimer() {
+  const { left, setTimer, running } = useTimer();
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        close();
-        triggerRef.current?.focus();
-      }
-    };
-    const onDown = (e: PointerEvent) => {
-      if (!popRef.current?.contains(e.target as Node) && !triggerRef.current?.contains(e.target as Node)) {
-        close();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    document.addEventListener("pointerdown", onDown);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      document.removeEventListener("pointerdown", onDown);
-    };
-  }, [open, close]);
+  const refs = useRef([triggerRef, popRef]).current;
+  useDismiss(open, close, refs);
 
+  const label = timerLabel(left);
   return (
     <div className="relative">
       <button
         ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="relative px-3 py-1.5 transition-transform active:scale-95"
+        className="tap relative px-3 transition-transform active:scale-95"
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls="timer-menu"
-        aria-label={ms === null ? "Set a sleep timer" : `Sleep timer, ${label} left`}
+        aria-label={running ? `Sleep timer, ${label} left` : "Set a sleep timer"}
       >
         <RoughBorder
           seedKey="timer-btn"
           radius={12}
-          stroke={left !== null ? "var(--accent)" : "var(--ink)"}
-          strokeWidth={left !== null ? 2.2 : 1.4}
-          opacity={left !== null ? 1 : 0.4}
+          stroke={running ? "var(--accent)" : "var(--ink)"}
+          strokeWidth={running ? 2.2 : 1.4}
+          opacity={running ? 1 : 0.4}
         />
         <span className="hand relative z-10 text-sm" style={{ color: "var(--ink)" }}>
           {label}
@@ -109,87 +196,58 @@ function Timer() {
           style={{ background: "var(--paper-2)", boxShadow: "0 8px 28px -12px rgba(0,0,0,0.3)" }}
         >
           <RoughBorder seedKey="timer-pop" radius={16} stroke="var(--ink)" strokeWidth={1.6} opacity={0.5} />
-          {TIMER_OPTIONS.map((m) => (
-            <button
-              key={m}
-              type="button"
-              onClick={() => {
-                setTimer(m);
-                setOpen(false);
-              }}
-              role="menuitem"
-              className="relative z-10 rounded-lg px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--paper-3)]"
-              style={{ color: "var(--ink)" }}
-            >
-              <span className="hand">
-                {m < 60 ? `${m} minutes` : `${m / 60} hour${m > 60 ? "s" : ""}`}
-              </span>
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => {
-              setTimer(null);
+          <TimerOptions
+            onPick={(m) => {
+              setTimer(m);
               setOpen(false);
             }}
-            role="menuitem"
-            className="relative z-10 rounded-lg px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--paper-3)]"
-            style={{ color: "var(--ink-soft)" }}
-          >
-            <span className="hand">no end</span>
-          </button>
+          />
         </div>
       )}
     </div>
   );
 }
 
-function ThemeSwitcher() {
-  const theme = useDhvani((s) => s.theme);
-  const setTheme = useDhvani((s) => s.setTheme);
+/** Everything that does not earn permanent space on a phone. */
+function MobileSheet({ onClose }: { onClose: () => void }) {
+  const { left, setTimer, running } = useTimer();
   return (
-    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Paper">
-      {THEMES.map((t) => {
-        const on = t.id === theme;
-        return (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTheme(t.id)}
-            title={`${t.name} ${t.jp}, ${t.mood}`}
-            aria-label={`${t.name} theme`}
-            aria-pressed={on}
-            className="relative h-7 w-7 transition-transform duration-200 hover:scale-115"
-            style={{ transform: on ? "scale(1.18)" : undefined }}
-          >
-            {/* Drawn, not geometric. These sit in the top bar permanently and
-                were the one component opting out of the whole drawing system. */}
-            <svg viewBox="0 0 28 28" className="h-full w-full overflow-visible">
-              <RoughCircle
-                cx={14}
-                cy={14}
-                r={11}
-                seedKey={`sw-${t.id}`}
-                stroke={on ? t.colors.accent : t.colors.line}
-                fill={t.colors.paper}
-                strokeWidth={on ? 2.4 : 1.8}
-                amp={1}
-              />
-              <RoughCircle
-                cx={14}
-                cy={14}
-                r={5.5}
-                seedKey={`swi-${t.id}`}
-                stroke="none"
-                fill={t.colors.accent}
-                strokeWidth={0}
-                amp={0.9}
-                opacity={on ? 1 : 0.55}
-              />
-            </svg>
-          </button>
-        );
-      })}
+    <div
+      id="more-menu"
+      className="relative mx-3 mb-3 flex flex-col gap-3 rounded-2xl p-3 sm:hidden"
+      style={{ background: "var(--paper-2)" }}
+    >
+      <RoughBorder seedKey="sheet" radius={18} stroke="var(--ink)" strokeWidth={1.7} opacity={0.5} />
+
+      <div className="relative z-10">
+        <p className="hand mb-1.5 text-sm" style={{ color: "var(--ink-soft)" }}>
+          paper
+        </p>
+        <Swatches size={34} />
+      </div>
+
+      <div className="relative z-10">
+        <p className="hand mb-1.5 text-sm" style={{ color: "var(--ink-soft)" }}>
+          stop after {running ? timerLabel(left) : ""}
+        </p>
+        <div className="flex flex-wrap gap-1.5" role="menu">
+          <TimerOptions
+            onPick={(m) => {
+              setTimer(m);
+              onClose();
+            }}
+          />
+        </div>
+      </div>
+
+      <Link
+        href="/credits"
+        onClick={onClose}
+        className="hand tap relative z-10 px-1 text-sm underline-offset-4"
+        style={{ color: "var(--accent-text)" }}
+      >
+        what it is made of, and who to thank
+      </Link>
     </div>
   );
 }
@@ -201,60 +259,84 @@ export function TopBar() {
   // A count, not the object: a fresh levels object on every change re-rendered
   // the whole header, logo and border included, on every drag frame.
   const playing = useDhvani((s) => Object.keys(s.levels).length + (s.music ? 1 : 0));
+  const [menu, setMenu] = useState(false);
 
   return (
     <header
       className="sticky top-0 z-40 backdrop-blur-[2px]"
-      style={{ background: "color-mix(in oklab, var(--paper) 86%, transparent)" }}
+      style={{
+        background: "color-mix(in oklab, var(--paper) 88%, transparent)",
+        paddingTop: "env(safe-area-inset-top)",
+      }}
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-5 gap-y-3 px-4 py-3 sm:px-6">
-        <Link href="/" className="flex items-baseline gap-2.5" aria-label="Dhvani, home">
-          <Logo height={38} />
+      <div className="mx-auto flex max-w-6xl items-center gap-2.5 px-3 py-2 sm:gap-5 sm:px-6 sm:py-3">
+        <Link href="/" className="flex shrink-0 items-baseline gap-2.5" aria-label="Dhvani, home">
+          <Logo height={32} />
           <span className="hand hidden text-lg sm:inline" style={{ color: "var(--ink-soft)" }}>
             dhvani
           </span>
         </Link>
 
-        <div className="ml-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
-          {/* The only way to pull everything down without losing the mix, so
-              it cannot be the thing that disappears on a phone. */}
-          <label className="order-last flex basis-full items-center gap-2 sm:order-none sm:basis-auto">
-            <span className="hand text-sm" style={{ color: "var(--ink-soft)" }}>
-              all
-            </span>
-            <span className="w-full sm:w-28">
-              <InkSlider
-                value={master}
-                onChange={setMaster}
-                seed="master"
-                label="Master volume"
-              />
-            </span>
-          </label>
+        {/* The fader keeps the middle of the bar at every size. It is the one
+            control people reach for without thinking. */}
+        <label className="flex min-w-0 flex-1 items-center gap-2 sm:ml-auto sm:max-w-[9rem] sm:flex-none">
+          <span className="hand hidden text-sm sm:inline" style={{ color: "var(--ink-soft)" }}>
+            all
+          </span>
+          <span className="min-w-0 flex-1">
+            <InkSlider value={master} onChange={setMaster} seed="master" label="Master volume" />
+          </span>
+        </label>
 
-          <ThemeSwitcher />
-          <Timer />
+        {playing > 0 && (
+          <button
+            type="button"
+            onClick={clear}
+            className="tap hand shrink-0 px-1 text-sm underline-offset-4 hover:underline"
+            style={{ color: "var(--ink-soft)" }}
+            aria-label={`Stop all, ${playing} playing`}
+          >
+            stop
+          </button>
+        )}
 
-          {playing > 0 && (
-            <button
-              type="button"
-              onClick={clear}
-              className="hand text-sm underline-offset-4 hover:underline"
-              style={{ color: "var(--ink-soft)" }}
-            >
-              stop all
-            </button>
-          )}
-
+        <div className="hidden items-center gap-4 sm:flex">
+          <Swatches />
+          <DesktopTimer />
           <Link
             href="/credits"
-            className="hand text-sm underline-offset-4 hover:underline"
+            className="hand tap text-sm underline-offset-4 hover:underline"
             style={{ color: "var(--ink-soft)" }}
           >
             credits
           </Link>
         </div>
+
+        <button
+          type="button"
+          onClick={() => setMenu((v) => !v)}
+          className="tap-sq relative shrink-0 sm:hidden"
+          aria-expanded={menu}
+          aria-controls="more-menu"
+          aria-label="Paper, timer and credits"
+        >
+          <svg viewBox="0 0 28 22" className="h-6 w-7 overflow-visible" aria-hidden>
+            {[5, 11, 17].map((y, i) => (
+              <path
+                key={y}
+                d={`M 3 ${y} C 10 ${y - 1.6 + i}, 18 ${y + 1.4 - i}, 25 ${y}`}
+                fill="none"
+                stroke="var(--ink)"
+                strokeWidth={2}
+                strokeLinecap="round"
+                opacity={0.75}
+              />
+            ))}
+          </svg>
+        </button>
       </div>
+
+      {menu && <MobileSheet onClose={() => setMenu(false)} />}
     </header>
   );
 }

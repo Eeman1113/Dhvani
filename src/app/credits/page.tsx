@@ -69,7 +69,7 @@ export default function Credits() {
       <div className="relative" style={{ zIndex: 10 }}>
         <TopBar />
 
-        <main className="relative mx-auto max-w-3xl px-4 pb-28 pt-10 sm:px-6">
+        <main className="relative mx-auto max-w-3xl px-3 pb-24 pt-6 sm:px-6 sm:pt-10">
           {/*
             The atmosphere follows you onto this page, which is right, but this
             one is for reading. A soft sheet of the paper colour behind the
@@ -83,7 +83,7 @@ export default function Credits() {
             }}
             aria-hidden
           />
-          <header className="mb-14 flex flex-col items-center text-center">
+          <header className="mb-10 flex flex-col items-center text-center sm:mb-14">
             <Logo height={62} />
             <h1 className="hand mt-5 text-3xl" style={{ color: "var(--ink)" }}>
               What this is made of
@@ -95,7 +95,7 @@ export default function Credits() {
             </p>
           </header>
 
-          <nav className="mb-14 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
+          <nav className="mb-10 flex flex-wrap justify-center gap-x-4 gap-y-0 text-sm sm:mb-14">
             {[
               ["why", "why"],
               ["sound", "how the sounds are made"],
@@ -103,7 +103,7 @@ export default function Credits() {
               ["recordings", "the recordings"],
               ["made", "everything else"],
             ].map(([id, label]) => (
-              <a key={id} href={`#${id}`} className="hand underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
+              <a key={id} href={`#${id}`} className="hand tap underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
                 {label}
               </a>
             ))}
@@ -338,13 +338,13 @@ export default function Credits() {
                   style={{ background: "var(--paper-2)" }}
                 >
                   <RoughBorder seedKey={`cr-${c.id}`} radius={14} stroke="var(--ink)" strokeWidth={1.3} opacity={0.3} />
-                  <div className="relative z-10 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <div className="relative z-10 flex flex-col gap-x-4 gap-y-0 sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between">
                     <div className="min-w-0">
                       <a
                         href={c.sourceUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hand text-[1.05rem] underline-offset-4 hover:underline"
+                        className="hand tap text-[1.05rem] underline-offset-4 hover:underline"
                         style={{ color: "var(--ink)" }}
                       >
                         {c.author}
@@ -359,7 +359,7 @@ export default function Credits() {
                         href={c.licenseUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="underline-offset-4 hover:underline"
+                        className="tap underline-offset-4 hover:underline"
                         style={{ color: "var(--accent-text)" }}
                       >
                         {c.license}
@@ -378,7 +378,7 @@ export default function Credits() {
                 href="https://freesound.org"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline-offset-4 hover:underline"
+                className="tap underline-offset-4 hover:underline"
                 style={{ color: "var(--accent-text)" }}
               >
                 Freesound
@@ -438,7 +438,7 @@ export default function Credits() {
           </Section>
 
           <footer className="mt-20 flex flex-col items-center gap-3 text-center">
-            <Link href="/" className="hand text-base underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
+            <Link href="/" className="hand tap text-base underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
               back to the machine
             </Link>
             <p className="text-[0.78rem]" style={{ color: "var(--ink-soft)" }}>

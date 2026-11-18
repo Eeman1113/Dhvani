@@ -36,7 +36,22 @@ type P = {
   sprite: number;
 };
 
-const MAX = 520;
+/**
+ * Particle budget.
+ *
+ * A phone is doing all of this on a battery, behind a sticky header, under
+ * eighty-odd boiling SVG borders, while synthesising audio. It gets a
+ * smaller sky. The cut is by viewport width rather than by user agent so a
+ * narrow desktop window gets the same relief.
+ */
+function particleBudget() {
+  if (typeof window === "undefined") return 520;
+  const w = window.innerWidth;
+  const cores = navigator.hardwareConcurrency ?? 4;
+  if (w < 640) return cores <= 4 ? 110 : 170;
+  if (w < 1024) return 300;
+  return 520;
+}
 
 /** Sprites painted for this project. Loaded once, drawn thousands of times. */
 const SPRITE_SRCS = [
@@ -73,8 +88,12 @@ export function Particles() {
     let w = 0;
     let h = 0;
     let dpr = 1;
+    let max = particleBudget();
     const resize = () => {
-      dpr = Math.min(2, window.devicePixelRatio || 1);
+      max = particleBudget();
+      // A phone's device pixel ratio is routinely 3. Rendering soft, blurry
+      // particles at 3x costs nine times the fill rate and looks identical.
+      dpr = Math.min(window.innerWidth < 640 ? 1.5 : 2, window.devicePixelRatio || 1);
       w = canvas.clientWidth;
       h = canvas.clientHeight;
       canvas.width = Math.floor(w * dpr);
@@ -105,7 +124,7 @@ export function Particles() {
     const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 
     const spawn = (kind: Kind) => {
-      if (pool.length >= MAX) return;
+      if (pool.length >= max) return;
       const p: P = {
         kind, x: 0, y: 0, vx: 0, vy: 0, life: 0, maxLife: 1,
         size: 1, rot: 0, vrot: 0, seed: Math.random() * 1000, sprite: 0,
@@ -187,13 +206,17 @@ export function Particles() {
         (0.55 + 0.45 * Math.sin(performance.now() / 4200));
 
       // Spawn rates, per second, as functions of the mix.
+      // Spawn rates scale with the budget, so a small screen gets lighter
+      // weather rather than the same weather that then hits the cap and
+      // stutters as particles are refused.
+      const k = max / 520;
       const rates: Record<Kind, number> = {
-        rain: s.rain * s.rain * 260 * (1 - s.indoors * 0.45),
-        snow: s.snow * 70,
-        petal: Math.max(s.forest * 7, s.wind * 3.5) * (1 - s.indoors * 0.6),
-        ember: s.fire * 26,
-        firefly: s.night * 1.6,
-        dust: (s.indoors * 2.4 + s.activity * 0.8),
+        rain: s.rain * s.rain * 260 * (1 - s.indoors * 0.45) * k,
+        snow: s.snow * 70 * k,
+        petal: Math.max(s.forest * 7, s.wind * 3.5) * (1 - s.indoors * 0.6) * k,
+        ember: s.fire * 26 * k,
+        firefly: s.night * 1.6 * k,
+        dust: (s.indoors * 2.4 + s.activity * 0.8) * k,
       };
 
       for (const kind of Object.keys(rates) as Kind[]) {

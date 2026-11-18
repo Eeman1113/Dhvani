@@ -54,6 +54,13 @@ const MISTS = [
   { src: asset("/art/mist-4.webp"), top: "80%", speed: 34, depth: 0.2 },
 ];
 
+/** A phone gets three clouds and two mist bands, not five and three. */
+function layerBudget() {
+  if (typeof window === "undefined") return { clouds: CLOUDS.length, mists: MISTS.length };
+  const narrow = window.innerWidth < 640;
+  return { clouds: narrow ? 3 : CLOUDS.length, mists: narrow ? 2 : MISTS.length };
+}
+
 export function Atmosphere() {
   const sky = useRef<HTMLDivElement>(null);
   const mountains = useRef<HTMLDivElement>(null);
@@ -75,6 +82,10 @@ export function Atmosphere() {
     let tx = 0;
     let ty = 0;
     const onMove = (e: PointerEvent) => {
+      // Only a real hovering pointer drives the parallax. On a touch screen
+      // the only pointermove events are drags, so following them makes the
+      // whole background lurch every time you move a fader.
+      if (e.pointerType !== "mouse") return;
       tx = (e.clientX / window.innerWidth - 0.5) * 2;
       ty = (e.clientY / window.innerHeight - 0.5) * 2;
     };
@@ -91,6 +102,12 @@ export function Atmosphere() {
       scroll = window.scrollY;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+
+    let budget = layerBudget();
+    const onBudget = () => {
+      budget = layerBudget();
+    };
+    window.addEventListener("resize", onBudget, { passive: true });
 
     const drift = CLOUDS.map(() => Math.random() * 2000);
     const mistDrift = MISTS.map(() => Math.random() * 2000);
@@ -151,6 +168,10 @@ export function Atmosphere() {
       MISTS.forEach((m, i) => {
         const el = mists.current[i].el;
         if (!el) return;
+        if (i >= budget.mists) {
+          el.style.opacity = "0";
+          return;
+        }
         const windSpeed = m.speed * (0.35 + s.wind * 2.4);
         if (!reduced) mistDrift[i] += windSpeed * dt;
         const span = vw + 900;
@@ -165,6 +186,10 @@ export function Atmosphere() {
       CLOUDS.forEach((c, i) => {
         const el = clouds.current[i].el;
         if (!el) return;
+        if (i >= budget.clouds) {
+          el.style.opacity = "0";
+          return;
+        }
         // Base drift is always there, so the sky is alive in silence too.
         const speed = c.speed * (0.3 + s.wind * 3.2 + levels.mid * 0.5 * s.wind);
         if (!reduced) drift[i] += speed * dt;
@@ -251,6 +276,7 @@ export function Atmosphere() {
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", onBudget);
     };
   }, []);
 

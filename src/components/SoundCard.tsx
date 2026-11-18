@@ -98,7 +98,7 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
         <button
           type="button"
           onClick={() => setShowNote((v) => !v)}
-          className="absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-full text-[0.72rem] leading-none transition-opacity"
+          className="tap-sq absolute right-0 top-0 z-10 rounded-full text-[0.72rem] leading-none transition-opacity"
           style={{ color: "var(--ink-soft)", opacity: showNote ? 1 : 0.35 }}
           aria-label={`How ${sound.name} is made`}
           aria-expanded={showNote}

@@ -34,6 +34,12 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#f7f2e7",
+  // Let the page reach under a notch, then pad it back with safe-area insets.
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1,
+  // Deliberately no maximumScale: pinch zoom is an accessibility feature and
+  // blocking it to stop an input-focus zoom is not a trade worth making.
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

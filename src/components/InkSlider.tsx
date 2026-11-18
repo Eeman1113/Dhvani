@@ -74,7 +74,7 @@ export function InkSlider({
   const x = 4 + pct * (VB_W - 8);
 
   return (
-    <div className="relative h-[22px] w-full">
+    <div className="ink-fader relative w-full">
       <svg
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         preserveAspectRatio="none"
@@ -129,7 +129,7 @@ export function InkSlider({
       */}
       {!dim && (
         <svg
-          className="pointer-events-none absolute top-1/2 h-5 w-5 overflow-visible"
+          className="ink-thumb pointer-events-none absolute top-1/2 overflow-visible"
           style={{ left: `calc(${(pct * 100).toFixed(2)}% )`, transform: "translate(-50%, -50%)" }}
           viewBox="-10 -10 20 20"
           aria-hidden
