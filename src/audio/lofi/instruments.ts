@@ -508,7 +508,10 @@ export function hat({ ctx, dest }: Ctx, at: number, vel = 1, open = false) {
   s.buffer = nb;
   const hp = ctx.createBiquadFilter();
   hp.type = "highpass";
-  hp.frequency.value = 7000;
+  // Deliberately lower than a clean hat would be. The tape chain this feeds
+  // rolls off just above 8 kHz, so a hat highpassed at the usual 7 k comes out
+  // the other side as nothing at all. Measured: it cost the whole air band.
+  hp.frequency.value = 4800;
   const g = ctx.createGain();
   const dur = open ? 0.26 : 0.045;
   g.gain.setValueAtTime(0.0001, at);

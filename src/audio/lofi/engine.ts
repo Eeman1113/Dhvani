@@ -65,7 +65,7 @@ export function createDeck(mode: DeckMode): Deck {
   const tape: Tape = createTape(ctx, {
     wear: mode === "lofi" ? 0.75 : 0.3,
     crackle: mode === "lofi" ? 0.6 : 0.25,
-    tone: mode === "lofi" ? 7000 : 12000,
+    tone: mode === "lofi" ? 8200 : 12000,
     wow: mode === "lofi" ? 1 : 0.45,
   });
   tape.output.connect(out);
