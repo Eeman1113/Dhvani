@@ -29,11 +29,19 @@ export type Filler = (from: number, to: number) => void;
  * the window has to be wide enough to ride out a long React commit or a GC
  * pause; anything longer than this is not a backlog, it is a silent hole in
  * every voice at once.
+ *
+ * Eight seconds, because on a machine with no GPU acceleration a single
+ * frame of this page can take most of a second, and a run of them can take
+ * several. Measured: at ninety percent main-thread occupancy a four second
+ * window already held, but it left nothing spare, and the first report of
+ * the music stopping came from exactly that machine. The cost of a wider
+ * window is only that a fader change takes slightly longer to be heard.
  */
-const LOOKAHEAD = 4.0;
+const LOOKAHEAD = 8.0;
 const TICK_MS = 120;
 
 const fillers = new Set<Filler>();
+const reported = new WeakSet<Filler>();
 let worker: Worker | null = null;
 let fallbackTimer: ReturnType<typeof setInterval> | null = null;
 let filledUntil = 0;
@@ -87,10 +95,12 @@ function tick() {
       f(from, target);
     } catch (err) {
       // One bad voice must not stop the rest of the mix. But swallowing the
-      // error outright makes a scheduling bug look like silence, which is
-      // very hard to debug, so say so while developing.
-      if (process.env.NODE_ENV !== "production") {
-        console.error("[dhvani] clock filler threw:", err);
+      // error outright makes a scheduling bug look exactly like a silent
+      // stall, so it is reported once in any build. Once, because a filler
+      // that throws tends to throw every tick.
+      if (!reported.has(f)) {
+        reported.add(f);
+        console.error("[dhvani] a scheduled voice threw and was dropped:", err);
       }
     }
   }

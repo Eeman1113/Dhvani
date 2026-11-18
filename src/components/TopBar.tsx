@@ -7,6 +7,7 @@ import { RoughBorder, RoughCircle } from "@/components/Rough";
 import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
 import { THEMES } from "@/lib/themes";
+import { setTier, useTier } from "@/lib/perf";
 
 /**
  * The top bar.
@@ -165,6 +166,28 @@ function Swatches({ size = 28 }: { size?: number }) {
   );
 }
 
+/** Switch between the full drawing and the light one, at any time. */
+function TierToggle({ block = false }: { block?: boolean }) {
+  const tier = useTier();
+  const lite = tier === "lite";
+  return (
+    <button
+      type="button"
+      onClick={() => setTier(lite ? "full" : "lite")}
+      aria-pressed={lite}
+      className={`tap hand underline-offset-4 hover:underline ${block ? "px-1 text-sm" : "text-sm"}`}
+      style={{ color: lite ? "var(--accent-text)" : "var(--ink-soft)" }}
+      title={
+        lite
+          ? "Currently drawing the light version. Every sound is the same either way."
+          : "Draw less: no moving background, no particles, no redrawn lines. All sounds unchanged."
+      }
+    >
+      {lite ? "light drawing is on" : "draw less"}
+    </button>
+  );
+}
+
 function DesktopTimer() {
   const { left, setTimer, running } = useTimer();
   const [open, setOpen] = useState(false);
@@ -251,6 +274,17 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
         </div>
       </div>
 
+      <div className="relative z-10">
+        <p className="hand mb-1 text-sm" style={{ color: "var(--ink-soft)" }}>
+          drawing
+        </p>
+        <TierToggle block />
+        <p className="mt-0.5 text-[0.72rem] leading-snug" style={{ color: "var(--ink-soft)" }}>
+          The light version keeps every sound and both music modes. It just
+          draws less, which helps an older machine.
+        </p>
+      </div>
+
       <Link
         href="/credits"
         onClick={onClose}
@@ -314,6 +348,7 @@ export function TopBar() {
         <div className="hidden items-center gap-4 sm:flex">
           <Swatches />
           <DesktopTimer />
+          <TierToggle />
           <Link
             href="/credits"
             className="hand tap text-sm underline-offset-4 hover:underline"

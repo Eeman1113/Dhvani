@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Zen_Maru_Gothic, Caveat, Kalam } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { PerfOffer } from "@/components/PerfOffer";
 import { BASE_PATH } from "@/lib/asset";
 import "./globals.css";
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${zen.variable} ${caveat.variable} ${kalam.variable} antialiased`}>
         <ThemeProvider />
         {children}
+        <PerfOffer />
         {/* Toggling a sound changes a colour and starts a fade. Neither is
             perceivable without sight, so say what happened. */}
         <div id="dhvani-live" role="status" aria-live="polite" className="sr-only" />

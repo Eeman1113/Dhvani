@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { RoughCircle, RoughLine } from "@/components/Rough";
 import { useMotion } from "@/lib/useMotion";
+import { Anim, AnimT } from "./Anim";
 import { hashString, seeded, type Pt } from "@/lib/rough";
 
 /**
@@ -20,7 +21,7 @@ const acc2 = "var(--accent-2)";
 const paper2 = "var(--paper-2)";
 const paper3 = "var(--paper-3)";
 
-type Props = { active: boolean; id: string };
+type Props = { active: boolean; id: string; lite?: boolean };
 type Band = "bass" | "mid" | "air" | "rms";
 
 function Box({ children }: { children: React.ReactNode }) {
@@ -101,13 +102,13 @@ const Snow = doodle(
         {[0, 1, 2].map((i) => (
           <path key={i} d={`M 6 ${20 + i * 11} C 22 ${15 + i * 11}, 40 ${25 + i * 11}, 58 ${18 + i * 11}`}
             fill="none" stroke={ink} strokeWidth={2} strokeLinecap="round" opacity={0.5}>
-            <animate attributeName="stroke-dasharray" values="0 80;50 80;80 0" dur={`${2.4 + i * 0.6}s`} repeatCount="indefinite" />
+            <Anim attributeName="stroke-dasharray" values="0 80;50 80;80 0" dur={`${2.4 + i * 0.6}s`} repeatCount="indefinite" />
           </path>
         ))}
         {flakes.map((f, i) => (
           <circle key={i} cx={f.x} cy={f.y} r={f.s} fill={acc} opacity={0.8}>
-            <animate attributeName="cy" values={`${f.y};${f.y + 16}`} dur={`${1.8 + f.d}s`} repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0;0.85;0" dur={`${1.8 + f.d}s`} repeatCount="indefinite" />
+            <Anim attributeName="cy" values={`${f.y};${f.y + 16}`} dur={`${1.8 + f.d}s`} repeatCount="indefinite" />
+            <Anim attributeName="opacity" values="0;0.85;0" dur={`${1.8 + f.d}s`} repeatCount="indefinite" />
           </circle>
         ))}
       </>
@@ -147,7 +148,7 @@ const Rapids = doodle(
       {[0, 1, 2, 3].map((i) => (
         <path key={i} d={`M 4 ${18 + i * 9} C 14 ${12 + i * 9}, 20 ${24 + i * 9}, 30 ${18 + i * 9} C 40 ${12 + i * 9}, 48 ${24 + i * 9}, 60 ${18 + i * 9}`}
           fill="none" stroke={i % 2 ? acc : ink} strokeWidth={2.4} strokeLinecap="round">
-          <animateTransform attributeName="transform" type="translate" values="-8 0;8 0;-8 0" dur={`${1.4 + i * 0.4}s`} repeatCount="indefinite" />
+          <AnimT attributeName="transform" type="translate" values="-8 0;8 0;-8 0" dur={`${1.4 + i * 0.4}s`} repeatCount="indefinite" />
         </path>
       ))}
       <RoughCircle cx={18} cy={40} r={5} seedKey="rap1" stroke={ink} fill={paper3} strokeWidth={2} />
@@ -164,7 +165,7 @@ const Waterfall = doodle(
       {[20, 26, 32, 38, 44].map((x, i) => (
         <path key={x} d={`M ${x} 8 C ${x + 2} 20, ${x - 2} 30, ${x} 40`} fill="none" stroke={i === 2 ? acc : ink}
           strokeWidth={2} strokeLinecap="round" opacity={0.8}>
-          <animate attributeName="stroke-dasharray" values="0 50;30 50;50 0" dur={`${0.8 + i * 0.15}s`} repeatCount="indefinite" />
+          <Anim attributeName="stroke-dasharray" values="0 50;30 50;50 0" dur={`${0.8 + i * 0.15}s`} repeatCount="indefinite" />
         </path>
       ))}
       <RoughLine points={[[10, 8], [54, 8]] as Pt[]} seedKey="wfedge" stroke={ink} strokeWidth={2.6} />
@@ -186,12 +187,12 @@ const Underwater = doodle(
     return (
       <>
         <path d="M 4 12 C 20 8, 44 16, 60 10" fill="none" stroke={acc} strokeWidth={2.2} strokeLinecap="round" opacity={0.7}>
-          <animateTransform attributeName="transform" type="translate" values="0 0;0 2;0 0" dur="3s" repeatCount="indefinite" />
+          <AnimT attributeName="transform" type="translate" values="0 0;0 2;0 0" dur="3s" repeatCount="indefinite" />
         </path>
         {bubbles.map((b, i) => (
           <circle key={i} cx={b.x} cy={50} r={b.s} fill="none" stroke={i % 2 ? acc : ink} strokeWidth={1.6}>
-            <animate attributeName="cy" values="52;14" dur={`${b.d}s`} begin={`${b.del}s`} repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0;0.9;0" dur={`${b.d}s`} begin={`${b.del}s`} repeatCount="indefinite" />
+            <Anim attributeName="cy" values="52;14" dur={`${b.d}s`} begin={`${b.del}s`} repeatCount="indefinite" />
+            <Anim attributeName="opacity" values="0;0.9;0" dur={`${b.d}s`} begin={`${b.del}s`} repeatCount="indefinite" />
           </circle>
         ))}
         <path d="M 8 56 C 22 52, 40 58, 58 54" fill="none" stroke={ink} strokeWidth={1.6} opacity={0.35} />
@@ -208,8 +209,8 @@ const Drip = doodle(
       <path d="M 20 15 C 19 20, 21 22, 20 26" stroke={ink} strokeWidth={1.4} fill="none" opacity={0.45} />
       <path d="M 44 14 C 45 19, 43 21, 44 24" stroke={ink} strokeWidth={1.4} fill="none" opacity={0.45} />
       <path d="M 32 18 C 32 24, 29 27, 32 31 C 35 27, 32 24, 32 18 Z" fill={acc} stroke={ink} strokeWidth={1.6}>
-        <animate attributeName="opacity" values="1;1;0" dur="2.6s" repeatCount="indefinite" />
-        <animateTransform attributeName="transform" type="translate" values="0 0;0 20;0 20" dur="2.6s" repeatCount="indefinite" />
+        <Anim attributeName="opacity" values="1;1;0" dur="2.6s" repeatCount="indefinite" />
+        <AnimT attributeName="transform" type="translate" values="0 0;0 20;0 20" dur="2.6s" repeatCount="indefinite" />
       </path>
       <ellipse cx={32} cy={52} rx={13} ry={3.4} fill="none" stroke={ink} strokeWidth={2} />
       {[0, 1].map((i) => (
@@ -254,7 +255,7 @@ const Frog = doodle(
       <path d="M 16 44 L 10 50 M 48 44 L 54 50" stroke={ink} strokeWidth={2} strokeLinecap="round" />
       {/* the throat sac, inflating */}
       <ellipse cx={32} cy={47} rx={7} ry={4} fill={paper3} stroke={ink} strokeWidth={1.8}>
-        <animate attributeName="ry" values="2;6;2" dur="1.8s" repeatCount="indefinite" />
+        <Anim attributeName="ry" values="2;6;2" dur="1.8s" repeatCount="indefinite" />
       </ellipse>
     </>
   ),
@@ -270,10 +271,10 @@ const Owl = doodle(
       <circle cx={25} cy={28} r={6.5} fill={paper2} stroke={ink} strokeWidth={2} />
       <circle cx={39} cy={28} r={6.5} fill={paper2} stroke={ink} strokeWidth={2} />
       <circle cx={25} cy={28} r={2.6} fill={ink}>
-        <animate attributeName="r" values="2.6;2.6;0.4;2.6" dur="4.5s" repeatCount="indefinite" />
+        <Anim attributeName="r" values="2.6;2.6;0.4;2.6" dur="4.5s" repeatCount="indefinite" />
       </circle>
       <circle cx={39} cy={28} r={2.6} fill={ink}>
-        <animate attributeName="r" values="2.6;2.6;0.4;2.6" dur="4.5s" repeatCount="indefinite" />
+        <Anim attributeName="r" values="2.6;2.6;0.4;2.6" dur="4.5s" repeatCount="indefinite" />
       </circle>
       <path d="M 32 32 L 29 37 L 35 37 Z" fill={acc} stroke={ink} strokeWidth={1.4} strokeLinejoin="round" />
       <path d="M 24 44 C 28 47, 36 47, 40 44" fill="none" stroke={ink} strokeWidth={1.4} opacity={0.45} />
@@ -307,7 +308,7 @@ const Bird = doodle(
       {[0, 1].map((i) => (
         <path key={i} d={`M ${54 + i * 4} 18 C ${57 + i * 4} 22, ${57 + i * 4} 28, ${54 + i * 4} 32`}
           fill="none" stroke={acc} strokeWidth={1.6} strokeLinecap="round" opacity={0.65 - i * 0.25}>
-          <animate attributeName="opacity" values={`0;${0.65 - i * 0.25};0`} dur="2.8s" begin={`${i * 0.4}s`} repeatCount="indefinite" />
+          <Anim attributeName="opacity" values={`0;${0.65 - i * 0.25};0`} dur="2.8s" begin={`${i * 0.4}s`} repeatCount="indefinite" />
         </path>
       ))}
     </>
@@ -339,7 +340,7 @@ const Cafe = doodle(
       <ellipse cx={27} cy={40} rx={11} ry={3.4} fill={paper2} stroke={ink} strokeWidth={2} />
       <path d="M 38 43 C 46 43, 46 51, 38 51" fill="none" stroke={ink} strokeWidth={2.2} strokeLinecap="round" />
       <path d="M 24 36 C 26 31, 22 29, 24 25" fill="none" stroke={acc} strokeWidth={1.8} strokeLinecap="round" opacity={0.75}>
-        <animate attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite" />
+        <Anim attributeName="opacity" values="0.3;0.8;0.3" dur="3s" repeatCount="indefinite" />
       </path>
     </>
   ),
@@ -369,13 +370,13 @@ const Glass = doodle(
     <>
       <path d="M 20 14 L 44 14 L 40 52 L 24 52 Z" fill={paper2} stroke={ink} strokeWidth={2.2} strokeLinejoin="round" />
       <path d="M 22 28 L 42 28 L 40 52 L 24 52 Z" fill={acc} opacity={0.5} stroke="none">
-        <animate attributeName="opacity" values="0.4;0.6;0.4" dur="4s" repeatCount="indefinite" />
+        <Anim attributeName="opacity" values="0.4;0.6;0.4" dur="4s" repeatCount="indefinite" />
       </path>
       <ellipse cx={32} cy={28} rx={10} ry={2.6} fill={paper3} stroke={ink} strokeWidth={1.6} />
       {[0, 1, 2].map((i) => (
         <circle key={i} cx={27 + i * 5} cy={44} r={1.6} fill={paper2} stroke={ink} strokeWidth={1}>
-          <animate attributeName="cy" values="48;30" dur={`${1.6 + i * 0.5}s`} repeatCount="indefinite" />
-          <animate attributeName="opacity" values="0;1;0" dur={`${1.6 + i * 0.5}s`} repeatCount="indefinite" />
+          <Anim attributeName="cy" values="48;30" dur={`${1.6 + i * 0.5}s`} repeatCount="indefinite" />
+          <Anim attributeName="opacity" values="0;1;0" dur={`${1.6 + i * 0.5}s`} repeatCount="indefinite" />
         </circle>
       ))}
     </>
@@ -408,7 +409,7 @@ const Desk = doodle(
       <path d="M 22 12 L 42 12 L 42 26 L 22 26 Z" fill={paper2} stroke={ink} strokeWidth={2.2} strokeLinejoin="round" />
       <path d="M 32 26 L 32 30" stroke={ink} strokeWidth={2} />
       <path d="M 25 17 L 39 17 M 25 21 L 35 21" stroke={acc} strokeWidth={1.6} strokeLinecap="round">
-        <animate attributeName="opacity" values="0.4;1;0.4" dur="2.8s" repeatCount="indefinite" />
+        <Anim attributeName="opacity" values="0.4;1;0.4" dur="2.8s" repeatCount="indefinite" />
       </path>
       <Bubble x={40} y={6} w={18} h={10} fill={acc} delay={0.6} />
     </>
@@ -426,7 +427,7 @@ const Door = doodle(
       {[0, 1, 2].map((i) => (
         <path key={i} d={`M ${50 + i * 4} 24 C ${53 + i * 4} 28, ${53 + i * 4} 36, ${50 + i * 4} 40`}
           fill="none" stroke={acc} strokeWidth={1.8} strokeLinecap="round" opacity={0.8 - i * 0.22}>
-          <animate attributeName="opacity" values={`0;${0.8 - i * 0.22};0`} dur="2.6s" begin={`${i * 0.3}s`} repeatCount="indefinite" />
+          <Anim attributeName="opacity" values={`0;${0.8 - i * 0.22};0`} dur="2.6s" begin={`${i * 0.3}s`} repeatCount="indefinite" />
         </path>
       ))}
     </>
@@ -443,7 +444,7 @@ const Book = doodle(
       <path d="M 15 23 L 27 24 M 15 29 L 27 30 M 15 35 L 25 36 M 37 24 L 49 23 M 37 30 L 49 29 M 39 36 L 49 35"
         stroke={ink} strokeWidth={1.2} opacity={0.4} strokeLinecap="round" />
       <path d="M 32 20 C 36 16, 42 14, 46 14" fill="none" stroke={acc} strokeWidth={2} strokeLinecap="round">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="5s" repeatCount="indefinite" />
+        <Anim attributeName="opacity" values="0.3;1;0.3" dur="5s" repeatCount="indefinite" />
       </path>
     </>
   ),
@@ -503,7 +504,7 @@ const Flute = doodle(
       {[0, 1, 2].map((i) => (
         <path key={i} d={`M ${42 + i * 5} 18 C ${46 + i * 5} 14, ${46 + i * 5} 10, ${42 + i * 5} 6`}
           fill="none" stroke={acc} strokeWidth={1.8} strokeLinecap="round" opacity={0.7 - i * 0.2}>
-          <animate attributeName="opacity" values={`0;${0.75 - i * 0.2};0`} dur="4s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
+          <Anim attributeName="opacity" values={`0;${0.75 - i * 0.2};0`} dur="4s" begin={`${i * 0.5}s`} repeatCount="indefinite" />
         </path>
       ))}
     </>
@@ -526,8 +527,8 @@ const Rainstick = doodle(
           ))}
           {grains.map((g, i) => (
             <circle key={i} cx={g.x} cy={14} r={1.5} fill={acc}>
-              <animate attributeName="cy" values="12;52" dur={`${g.d}s`} begin={`${g.del}s`} repeatCount="indefinite" />
-              <animate attributeName="opacity" values="0;1;0" dur={`${g.d}s`} begin={`${g.del}s`} repeatCount="indefinite" />
+              <Anim attributeName="cy" values="12;52" dur={`${g.d}s`} begin={`${g.del}s`} repeatCount="indefinite" />
+              <Anim attributeName="opacity" values="0;1;0" dur={`${g.d}s`} begin={`${g.del}s`} repeatCount="indefinite" />
             </circle>
           ))}
         </g>
@@ -545,7 +546,7 @@ function DroneMark({ rings, band }: { rings: number; band: Band }) {
         {Array.from({ length: rings }, (_, i) => (
           <circle key={i} cx={32} cy={32} r={6 + i * 5} fill="none" stroke={i % 2 ? acc : ink} strokeWidth={2 - i * 0.18}
             opacity={0.85 - i * 0.12}>
-            <animate attributeName="r" values={`${6 + i * 5};${7.5 + i * 5};${6 + i * 5}`} dur={`${3 + i * 0.8}s`} repeatCount="indefinite" />
+            <Anim attributeName="r" values={`${6 + i * 5};${7.5 + i * 5};${6 + i * 5}`} dur={`${3 + i * 0.8}s`} repeatCount="indefinite" />
           </circle>
         ))}
         <circle cx={32} cy={32} r={3} fill={acc} />
@@ -577,7 +578,7 @@ function KeyBoard({ keyR, tall, accentRow, seed }: { keyR: number; tall: number;
       {keys.map((k, i) => (
         <rect key={i} x={k.x} y={k.y} width={4.6} height={tall} rx={keyR}
           fill={k.row === accentRow ? acc : ink} opacity={k.row === accentRow ? 0.6 : 0.32}>
-          <animate attributeName="opacity" values="0.3;0.3;0.95;0.3" dur="2.4s" begin={`${k.d}s`} repeatCount="indefinite" />
+          <Anim attributeName="opacity" values="0.3;0.3;0.95;0.3" dur="2.4s" begin={`${k.d}s`} repeatCount="indefinite" />
         </rect>
       ))}
     </>
@@ -595,12 +596,12 @@ const Typewriter = doodle(
       <path d="M 18 18 L 46 18 L 46 32 L 18 32 Z" fill={paper2} stroke={ink} strokeWidth={2.2} strokeLinejoin="round" />
       <path d="M 22 10 L 44 10 L 44 18 L 22 18 Z" fill="var(--paper)" stroke={ink} strokeWidth={2} strokeLinejoin="round" />
       <path d="M 25 13 L 41 13" stroke={acc} strokeWidth={1.4} strokeLinecap="round">
-        <animate attributeName="opacity" values="0.3;1;0.3" dur="2.2s" repeatCount="indefinite" />
+        <Anim attributeName="opacity" values="0.3;1;0.3" dur="2.2s" repeatCount="indefinite" />
       </path>
       {[0, 1].map((row) =>
         [0, 1, 2, 3, 4, 5].map((col) => (
           <circle key={`${row}-${col}`} cx={16 + col * 6.4 + row * 3} cy={38 + row * 7} r={2.2} fill={ink} opacity={0.35}>
-            <animate attributeName="opacity" values="0.3;0.3;0.95;0.3" dur="2.6s" begin={`${(row * 6 + col) * 0.17}s`} repeatCount="indefinite" />
+            <Anim attributeName="opacity" values="0.3;0.3;0.95;0.3" dur="2.6s" begin={`${(row * 6 + col) * 0.17}s`} repeatCount="indefinite" />
           </circle>
         )),
       )}
@@ -615,7 +616,7 @@ const Pen = doodle(
     <>
       <path d="M 8 50 L 56 50" stroke={ink} strokeWidth={2.2} strokeLinecap="round" />
       <path d="M 12 42 C 20 38, 24 44, 32 40 C 40 36, 44 42, 52 38" fill="none" stroke={acc} strokeWidth={2} strokeLinecap="round">
-        <animate attributeName="stroke-dasharray" values="0 70;45 70;70 0" dur="4s" repeatCount="indefinite" />
+        <Anim attributeName="stroke-dasharray" values="0 70;45 70;70 0" dur="4s" repeatCount="indefinite" />
       </path>
       <g transform="rotate(38 40 24)" className="anim-bobble" style={css({ "--d": "1.6s" })}>
         <rect x={36} y={6} width={8} height={26} rx={2} fill={paper3} stroke={ink} strokeWidth={2} />
@@ -639,7 +640,7 @@ const Clock = doodle(
         );
       })}
       <line x1={32} y1={32} x2={32} y2={21} stroke={ink} strokeWidth={2.4} strokeLinecap="round">
-        <animateTransform attributeName="transform" type="rotate" values="0 32 32;360 32 32" dur="60s" repeatCount="indefinite" />
+        <AnimT attributeName="transform" type="rotate" values="0 32 32;360 32 32" dur="60s" repeatCount="indefinite" />
       </line>
       <line x1={32} y1={32} x2={41} y2={38} stroke={ink} strokeWidth={2.8} strokeLinecap="round" />
       <circle cx={32} cy={32} r={2.4} fill={acc} />
@@ -663,7 +664,7 @@ const Fridge = doodle(
       {[0, 1, 2].map((i) => (
         <path key={i} d={`M ${50 + i * 4} 30 C ${53 + i * 4} 34, ${53 + i * 4} 40, ${50 + i * 4} 44`}
           fill="none" stroke={acc} strokeWidth={1.6} strokeLinecap="round" opacity={0.6 - i * 0.18}>
-          <animate attributeName="opacity" values={`0;${0.6 - i * 0.18};0`} dur="3.4s" begin={`${i * 0.4}s`} repeatCount="indefinite" />
+          <Anim attributeName="opacity" values={`0;${0.6 - i * 0.18};0`} dur="3.4s" begin={`${i * 0.4}s`} repeatCount="indefinite" />
         </path>
       ))}
     </>
@@ -700,7 +701,7 @@ const Kettle = doodle(
       {[0, 1, 2].map((i) => (
         <path key={i} d={`M ${50 + i * 2} 18 C ${54 + i * 2} 13, ${50 + i * 2} 9, ${53 + i * 2} 5`}
           fill="none" stroke={acc} strokeWidth={2} strokeLinecap="round" opacity={0.75 - i * 0.2}>
-          <animate attributeName="opacity" values={`0;${0.75 - i * 0.2};0`} dur="2.6s" begin={`${i * 0.4}s`} repeatCount="indefinite" />
+          <Anim attributeName="opacity" values={`0;${0.75 - i * 0.2};0`} dur="2.6s" begin={`${i * 0.4}s`} repeatCount="indefinite" />
         </path>
       ))}
     </>
@@ -714,9 +715,9 @@ const Heart = doodle(
       <g style={{ transformOrigin: "32px 34px" }}>
         <path d="M 32 50 C 14 38, 10 26, 16 20 C 22 14, 30 18, 32 24 C 34 18, 42 14, 48 20 C 54 26, 50 38, 32 50 Z"
           fill={acc} stroke={ink} strokeWidth={2.4} strokeLinejoin="round">
-          <animateTransform attributeName="transform" type="scale" values="1;1.1;0.98;1.04;1"
+          <AnimT attributeName="transform" type="scale" values="1;1.1;0.98;1.04;1"
             dur="1s" repeatCount="indefinite" additive="sum" />
-          <animateTransform attributeName="transform" type="translate" values="-3.2 -3.4;-3.2 -3.4"
+          <AnimT attributeName="transform" type="translate" values="-3.2 -3.4;-3.2 -3.4"
             dur="1s" repeatCount="indefinite" additive="sum" />
         </path>
       </g>
@@ -762,7 +763,7 @@ const Traffic = doodle(
         <g key={i}>
           <path d="M 0 0 L 4 -7 L 16 -7 L 21 0 L 22 7 L -1 7 Z" fill={c.fill} stroke={ink} strokeWidth={1.8} strokeLinejoin="round"
             transform={`translate(20 ${c.y})`}>
-            <animateTransform attributeName="transform" type="translate"
+            <AnimT attributeName="transform" type="translate"
               values={c.dir > 0 ? `-26 ${c.y}; 66 ${c.y}` : `66 ${c.y}; -26 ${c.y}`} dur={c.dur} repeatCount="indefinite" />
           </path>
         </g>
@@ -812,11 +813,11 @@ const Nocturne = doodle(
       {[14, 26, 38].map((x, i) => (
         <g key={x}>
           <ellipse cx={x} cy={48 - i * 2} rx={4} ry={3} fill={ink} transform={`rotate(-18 ${x} ${48 - i * 2})`}>
-            <animate attributeName="cy" values={`${48 - i * 2};${44 - i * 2};${48 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
+            <Anim attributeName="cy" values={`${48 - i * 2};${44 - i * 2};${48 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
           </ellipse>
           <line x1={x + 3.6} y1={48 - i * 2} x2={x + 3.6} y2={36 - i * 2} stroke={ink} strokeWidth={1.4} strokeLinecap="round">
-            <animate attributeName="y1" values={`${48 - i * 2};${44 - i * 2};${48 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
-            <animate attributeName="y2" values={`${36 - i * 2};${32 - i * 2};${36 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
+            <Anim attributeName="y1" values={`${48 - i * 2};${44 - i * 2};${48 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
+            <Anim attributeName="y2" values={`${36 - i * 2};${32 - i * 2};${36 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
           </line>
         </g>
       ))}
@@ -846,7 +847,7 @@ function Scribble({ density, colour, seed, active }: { density: number; colour: 
     <Box>
       <g ref={ref}>
         <path d={d} fill="none" stroke={colour} strokeWidth={1.3 + density} strokeLinecap="round" opacity={0.75}>
-          <animate attributeName="opacity" values="0.6;0.85;0.6" dur="3s" repeatCount="indefinite" />
+          <Anim attributeName="opacity" values="0.6;0.85;0.6" dur="3s" repeatCount="indefinite" />
         </path>
       </g>
     </Box>

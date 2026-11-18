@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { subscribeFrame, type Levels } from "@/audio/engine";
+import { getTier } from "./perf";
 
 /**
  * Audio-reactive motion, applied straight to the DOM.
@@ -46,6 +47,11 @@ export function useMotion<T extends SVGElement | HTMLElement>(opts: MotionOpts =
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Lite does not drive transforms from the frame loop at all. Eighty-odd
+    // elements each taking a style write every frame is most of the style
+    // and layout budget on a machine without a GPU, for an effect that is
+    // only ever a few pixels.
+    if (getTier() === "lite") return;
 
     let value = 0;
     let velocity = 0;

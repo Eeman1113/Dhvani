@@ -15,6 +15,7 @@ import { useEffect, useRef } from "react";
 import { subscribeFrame, type Levels } from "@/audio/engine";
 import { signals, refreshSignals, stepSignals } from "@/lib/signals";
 import { Particles } from "./Particles";
+import { useLite } from "@/lib/perf";
 import { asset } from "@/lib/asset";
 
 /**
@@ -62,6 +63,89 @@ function layerBudget() {
 }
 
 export function Atmosphere() {
+  const lite = useLite();
+  if (lite) return <LiteAtmosphere />;
+  return <FullAtmosphere />;
+}
+
+/**
+ * The light sky.
+ *
+ * No images, no filter, no canvas, no parallax and nothing written per frame.
+ * It is two CSS gradients whose colours are driven by the mix a few times a
+ * second, which is enough to keep the page answering what you are playing:
+ * fire still warms the paper from below, rain still cools it, night still
+ * darkens it. That was always the point of the background. The clouds were
+ * only ever the expensive way to say it.
+ */
+function LiteAtmosphere() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    let last = "";
+    let acc = 0;
+    let prev = performance.now();
+
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      const dt = Math.min((now - prev) / 1000, 0.1);
+      prev = now;
+      acc += dt;
+      // Four times a second. Colour does not need sixty.
+      if (acc < 0.25) return;
+      refreshSignals();
+      stepSignals(acc);
+      acc = 0;
+
+      const s = signals;
+      const warm = s.fire;
+      const cold = Math.max(s.rain, s.snow) * 0.8;
+      const dark = s.night;
+      const next =
+        `radial-gradient(130% 95% at 50% 112%, rgba(255,176,94,${(warm * 0.34).toFixed(2)}) 0%, rgba(255,176,94,0) 62%),` +
+        `radial-gradient(110% 75% at 50% -12%, rgba(104,134,176,${(cold * 0.3).toFixed(2)}) 0%, rgba(104,134,176,0) 72%),` +
+        `linear-gradient(180deg, rgba(26,28,48,${(dark * 0.3).toFixed(2)}) 0%, rgba(26,28,48,0) 55%, rgba(26,28,48,${(dark * 0.2).toFixed(2)}) 100%)`;
+      if (next !== last && ref.current) {
+        ref.current.style.background = next;
+        last = next;
+      }
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }} aria-hidden>
+      {/*
+        Painted once and never touched again. Lite still needs somewhere for
+        the page to sit: a warm pool of light where the paper curves, a cooler
+        wash at the top, and the suggestion of a horizon low down. It is the
+        same composition as the full scene, said in three gradients instead of
+        six images, a filter and a canvas.
+      */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(90% 55% at 50% 108%, color-mix(in oklab, var(--accent) 16%, transparent) 0%, transparent 70%)," +
+            "radial-gradient(120% 70% at 50% -16%, color-mix(in oklab, var(--accent-2) 11%, transparent) 0%, transparent 72%)," +
+            "linear-gradient(180deg, transparent 58%, color-mix(in oklab, var(--line) 30%, transparent) 86%, color-mix(in oklab, var(--line) 12%, transparent) 100%)",
+        }}
+      />
+      <div ref={ref} className="absolute inset-0" style={{ transition: "background 600ms linear" }} />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 100% at 50% 45%, transparent 58%, color-mix(in oklab, var(--ink) 8%, transparent) 100%)",
+        }}
+      />
+    </div>
+  );
+}
+
+function FullAtmosphere() {
   const sky = useRef<HTMLDivElement>(null);
   const mountains = useRef<HTMLDivElement>(null);
   const enso = useRef<HTMLDivElement>(null);

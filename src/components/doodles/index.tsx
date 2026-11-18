@@ -3,6 +3,8 @@
 import { useMemo } from "react";
 import { RoughCircle, RoughLine } from "@/components/Rough";
 import { useMotion } from "@/lib/useMotion";
+import { useLite } from "@/lib/perf";
+import { Anim, AnimT, LiteContext } from "./Anim";
 import { hashString, seeded } from "@/lib/rough";
 import type { Pt } from "@/lib/rough";
 import { MORE_DOODLES } from "./more";
@@ -19,7 +21,7 @@ const S = 64;
 const ink = "var(--ink)";
 const acc = "var(--accent)";
 
-type Props = { active: boolean; id: string };
+type Props = { active: boolean; id: string; lite?: boolean };
 
 function Box({ children }: { children: React.ReactNode }) {
   return (
@@ -115,7 +117,7 @@ const Window = ({ active, id }: Props) => {
         <RoughLine points={[[12, 31], [52, 31]] as Pt[]} seedKey={`${id}-winh`} stroke={ink} strokeWidth={1.6} opacity={0.6} />
         {beads.map((b, i) => (
           <circle key={i} cx={b.x} cy={b.y} r={b.s} fill={acc} opacity={0.65}>
-            <animate attributeName="cy" values={`${b.y};${b.y + 6};${b.y}`} dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
+            <Anim attributeName="cy" values={`${b.y};${b.y + 6};${b.y}`} dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
           </circle>
         ))}
       </g>
@@ -136,7 +138,7 @@ const Thunder = ({ active, id }: Props) => {
           strokeWidth={1.6}
           strokeLinejoin="round"
         >
-          <animate attributeName="opacity" values="1;1;0.25;1;0.6;1" dur="4.5s" repeatCount="indefinite" />
+          <Anim attributeName="opacity" values="1;1;0.25;1;0.6;1" dur="4.5s" repeatCount="indefinite" />
         </path>
       </g>
     </Box>
@@ -192,7 +194,7 @@ const Wind = ({ active }: Props) => {
               strokeWidth={2.2}
               strokeLinecap="round"
             >
-              <animate
+              <Anim
                 attributeName="stroke-dasharray"
                 values="0 90;60 90;90 0"
                 dur={`${3 + i * 0.7}s`}
@@ -254,7 +256,7 @@ const Wave = ({ active }: Props) => {
             strokeWidth={2.4}
             strokeLinecap="round"
           >
-            <animateTransform
+            <AnimT
               attributeName="transform"
               type="translate"
               values="-6 0; 6 0; -6 0"
@@ -364,7 +366,7 @@ const Keyboard = ({ active }: Props) => {
         <path d="M 10 26 L 54 26 L 58 52 L 6 52 Z" fill="var(--paper-3)" stroke={ink} strokeWidth={2.2} strokeLinejoin="round" />
         {keys.map((k, i) => (
           <rect key={i} x={k.x} y={k.y} width={4.4} height={4.4} rx={1.2} fill={ink} opacity={0.35}>
-            <animate attributeName="opacity" values="0.3;0.3;0.9;0.3" dur="2.4s" begin={`${k.d}s`} repeatCount="indefinite" />
+            <Anim attributeName="opacity" values="0.3;0.3;0.9;0.3" dur="2.4s" begin={`${k.d}s`} repeatCount="indefinite" />
           </rect>
         ))}
         <path d="M 24 20 C 26 14, 32 14, 34 18" fill="none" stroke={acc} strokeWidth={2} strokeLinecap="round" opacity={0.8} />
@@ -439,7 +441,7 @@ function Scribble({ density, colour, seed, active }: { density: number; colour: 
     <Box>
       <g ref={ref}>
         <path d={d} fill="none" stroke={colour} strokeWidth={1.3 + density} strokeLinecap="round" opacity={0.75}>
-          <animate attributeName="opacity" values="0.6;0.85;0.6" dur="3s" repeatCount="indefinite" />
+          <Anim attributeName="opacity" values="0.6;0.85;0.6" dur="3s" repeatCount="indefinite" />
         </path>
       </g>
     </Box>
@@ -475,7 +477,22 @@ export const DOODLES: Record<string, React.FC<Props>> = {
   brown: Brown,
 };
 
+/**
+ * One doodle.
+ *
+ * `data-playing` lets the light tier run the few decorative animations that
+ * belong to a sound you are actually listening to, and hold the rest still.
+ * A page with four things playing then animates four doodles instead of a
+ * hundred and fifty.
+ */
 export function Doodle({ name, active, id }: { name: string; active: boolean; id: string }) {
   const C = DOODLES[name] ?? Rain;
-  return <C active={active} id={id} />;
+  const lite = useLite();
+  return (
+    <LiteContext.Provider value={lite}>
+      <span data-playing={active ? "true" : "false"} className="block h-full w-full">
+        <C active={active} id={id} lite={lite} />
+      </span>
+    </LiteContext.Provider>
+  );
 }
