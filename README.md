@@ -8,7 +8,8 @@
 recordings, and a generative music deck that writes lofi and classical nocturnes
 one bar at a time. Put it on and leave it on.
 
-Made by **Eeman Majumder**.
+Made by **Eeman Majumder**<br>
+Logo by **[Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/)**
 
 </div>
 
@@ -129,10 +130,10 @@ and re-encoded; `AUDIO_SOURCES.md` records exactly what was done to each file.
 - **Dhvani is made by [Eeman Majumder](https://github.com/Eeman1113).** The
   synthesis, the generative music, the drawing system and everything else here,
   except where noted below.
-- The logo is the word **ध्वनि** handwritten in felt tip by
-  **[Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/)**,
-  photographed, cut out of its background and traced to vector. The waver in
-  the shirorekha is hers; none of the letterforms have been corrected.
+- **Logo by [Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/).**
+  The word **ध्वनि** in her own handwriting, written in felt tip on a sheet of
+  paper, photographed, cut out of its background and traced to vector. The
+  waver in the shirorekha is hers, and not a letterform has been corrected.
 - The painted background art (clouds, mist, mountains, moon, enso, leaves,
   birds) was generated with an image model, then cut apart, graded per theme and
   parallaxed by hand.

@@ -397,8 +397,8 @@ export default function Credits() {
               </Term>
             </Card>
             <Card seed="c-logo">
-              <Term word="The logo">
-                the word ध्वनि, written in felt-tip on a sheet of paper by{" "}
+              <Term word="Logo">
+                by{" "}
                 <a
                   href="https://www.linkedin.com/in/sakshi-sawarkar/"
                   target="_blank"
@@ -406,11 +406,12 @@ export default function Credits() {
                   className="tap underline-offset-4 hover:underline"
                   style={{ color: "var(--accent-text)" }}
                 >
-                  Sakshi Sawarkar
+                  <strong>Sakshi Sawarkar</strong>
                 </a>
-                . It is her handwriting, photographed, cut out of its background
-                and traced to vector. The waver in the shirorekha is the real
-                one, and nothing about the letterforms has been corrected.
+                . The word ध्वनि in her own handwriting, written in felt-tip on
+                a sheet of paper, photographed, cut out of its background and
+                traced to vector. The waver in the shirorekha is the real one,
+                and not a letterform has been corrected.
               </Term>
             </Card>
             <Card seed="c-art">
@@ -461,19 +462,22 @@ export default function Credits() {
             <p className="text-[0.82rem]" style={{ color: "var(--ink)" }}>
               Dhvani is made by Eeman Majumder.
             </p>
-            <p className="text-[0.76rem]" style={{ color: "var(--ink-soft)" }}>
-              The mark is{" "}
+            <p className="text-[0.8rem]" style={{ color: "var(--ink)" }}>
+              Logo by{" "}
               <a
                 href="https://www.linkedin.com/in/sakshi-sawarkar/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline-offset-4 hover:underline"
+                className="tap underline-offset-4 hover:underline"
                 style={{ color: "var(--accent-text)" }}
               >
                 Sakshi Sawarkar
               </a>
-              &apos;s handwriting. The field recordings are other people&apos;s,
-              and they are named above.
+              .
+            </p>
+            <p className="text-[0.74rem]" style={{ color: "var(--ink-soft)" }}>
+              The field recordings are other people&apos;s, and they are named
+              above.
             </p>
           </footer>
         </main>
