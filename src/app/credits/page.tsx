@@ -389,6 +389,13 @@ export default function Credits() {
           </Section>
 
           <Section id="made" title="Everything else" jp="他">
+            <Card seed="c-author">
+              <Term word="Dhvani">
+                made by <strong style={{ color: "var(--ink)" }}>Eeman Majumder</strong>.
+                The synthesis, the generative music, the drawing system and
+                everything else here, except where this page says otherwise.
+              </Term>
+            </Card>
             <Card seed="c-logo">
               <Term word="The logo">
                 the word ध्वनि, written in felt-tip on a sheet of paper by{" "}
@@ -451,8 +458,11 @@ export default function Credits() {
             <Link href="/" className="hand tap text-base underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
               back to the machine
             </Link>
-            <p className="text-[0.78rem]" style={{ color: "var(--ink-soft)" }}>
-              Made by Eeman Majumder. The mark is{" "}
+            <p className="text-[0.82rem]" style={{ color: "var(--ink)" }}>
+              Dhvani is made by Eeman Majumder.
+            </p>
+            <p className="text-[0.76rem]" style={{ color: "var(--ink-soft)" }}>
+              The mark is{" "}
               <a
                 href="https://www.linkedin.com/in/sakshi-sawarkar/"
                 target="_blank"
@@ -462,7 +472,8 @@ export default function Credits() {
               >
                 Sakshi Sawarkar
               </a>
-              &apos;s handwriting.
+              &apos;s handwriting. The field recordings are other people&apos;s,
+              and they are named above.
             </p>
           </footer>
         </main>

@@ -2,6 +2,14 @@
   "name": "dhvani",
   "version": "0.1.0",
   "private": true,
+  "description": "A hand drawn noise machine that never loops.",
+  "author": "Eeman Majumder",
+  "license": "MIT",
+  "homepage": "https://eeman1113.github.io/Dhvani/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Eeman1113/Dhvani.git"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

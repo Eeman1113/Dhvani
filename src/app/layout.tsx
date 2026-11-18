@@ -29,6 +29,8 @@ const kalam = Kalam({
 
 export const metadata: Metadata = {
   title: "Dhvani",
+  authors: [{ name: "Eeman Majumder" }],
+  creator: "Eeman Majumder",
   description:
     "A hand drawn noise machine. Stack rain, fire, wind and generated music, and leave it running for as long as you need it.",
   icons: { icon: `${BASE_PATH}/brand/favicon.svg` },
