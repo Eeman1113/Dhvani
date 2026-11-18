@@ -102,10 +102,18 @@ function LiteAtmosphere() {
       const warm = s.fire;
       const cold = Math.max(s.rain, s.snow) * 0.8;
       const dark = s.night;
+
+      // One gradient, not three stacked ones. Each full-viewport gradient
+      // costs about 4 ms of CPU raster and they repaint together, so three
+      // was 12 ms every time this changed. The warm, cold and night
+      // contributions are mixed into a single pass instead.
+      const r = Math.round(255 * warm + 104 * cold + 26 * dark);
+      const g = Math.round(176 * warm + 134 * cold + 28 * dark);
+      const b = Math.round(94 * warm + 176 * cold + 48 * dark);
+      const aBottom = (warm * 0.3 + dark * 0.22).toFixed(2);
+      const aTop = (cold * 0.26 + dark * 0.26).toFixed(2);
       const next =
-        `radial-gradient(130% 95% at 50% 112%, rgba(255,176,94,${(warm * 0.34).toFixed(2)}) 0%, rgba(255,176,94,0) 62%),` +
-        `radial-gradient(110% 75% at 50% -12%, rgba(104,134,176,${(cold * 0.3).toFixed(2)}) 0%, rgba(104,134,176,0) 72%),` +
-        `linear-gradient(180deg, rgba(26,28,48,${(dark * 0.3).toFixed(2)}) 0%, rgba(26,28,48,0) 55%, rgba(26,28,48,${(dark * 0.2).toFixed(2)}) 100%)`;
+        `linear-gradient(180deg, rgba(${r},${g},${b},${aTop}) 0%, rgba(${r},${g},${b},0) 48%, rgba(${r},${g},${b},${aBottom}) 100%)`;
       if (next !== last && ref.current) {
         ref.current.style.background = next;
         last = next;
@@ -133,7 +141,7 @@ function LiteAtmosphere() {
             "linear-gradient(180deg, transparent 58%, color-mix(in oklab, var(--line) 30%, transparent) 86%, color-mix(in oklab, var(--line) 12%, transparent) 100%)",
         }}
       />
-      <div ref={ref} className="absolute inset-0" style={{ transition: "background 600ms linear" }} />
+      <div ref={ref} className="absolute inset-0" />
       <div
         className="absolute inset-0"
         style={{
@@ -199,6 +207,7 @@ function FullAtmosphere() {
     let birdFlight = -1;
 
     let refreshIn = 0;
+    let lastSky = "";
 
     const step = (levels: Levels, dt: number) => {
       // The signal clock lives here rather than in the particle layer, because
@@ -232,10 +241,18 @@ function FullAtmosphere() {
         sky.current.style.opacity = String(
           0.1 + Math.max(warm, cold, dark) * 0.5 + s.activity * 0.08,
         );
-        sky.current.style.background =
-          `radial-gradient(120% 90% at 50% 112%, rgba(255,176,94,${(warm * 0.5).toFixed(3)}) 0%, rgba(255,176,94,0) 60%),` +
-          `radial-gradient(100% 70% at 50% -12%, rgba(104,134,176,${(cold * 0.45).toFixed(3)}) 0%, rgba(104,134,176,0) 70%),` +
-          `linear-gradient(180deg, rgba(26,28,48,${(dark * 0.42).toFixed(3)}) 0%, rgba(26,28,48,${(dark * 0.1).toFixed(3)}) 55%, rgba(26,28,48,${(dark * 0.3).toFixed(3)}) 100%)`;
+        // Quantised to two decimals and only assigned when it actually
+        // changes. Building the string is free; the full-viewport repaint it
+        // triggers is about 12 ms of raster, so doing it 60 times a second
+        // for a value that moves imperceptibly is the whole cost.
+        const nextSky =
+          `radial-gradient(120% 90% at 50% 112%, rgba(255,176,94,${(warm * 0.5).toFixed(2)}) 0%, rgba(255,176,94,0) 60%),` +
+          `radial-gradient(100% 70% at 50% -12%, rgba(104,134,176,${(cold * 0.45).toFixed(2)}) 0%, rgba(104,134,176,0) 70%),` +
+          `linear-gradient(180deg, rgba(26,28,48,${(dark * 0.42).toFixed(2)}) 0%, rgba(26,28,48,${(dark * 0.1).toFixed(2)}) 55%, rgba(26,28,48,${(dark * 0.3).toFixed(2)}) 100%)`;
+        if (nextSky !== lastSky) {
+          sky.current.style.background = nextSky;
+          lastSky = nextSky;
+        }
       }
 
       /* --- mountains ----------------------------------------------- */

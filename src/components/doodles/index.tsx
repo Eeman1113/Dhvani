@@ -1,9 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { RoughCircle, RoughLine } from "@/components/Rough";
 import { useMotion } from "@/lib/useMotion";
-import { useLite } from "@/lib/perf";
 import { Anim, AnimT, LiteContext } from "./Anim";
 import { hashString, seeded } from "@/lib/rough";
 import type { Pt } from "@/lib/rough";
@@ -487,12 +486,10 @@ export const DOODLES: Record<string, React.FC<Props>> = {
  */
 export function Doodle({ name, active, id }: { name: string; active: boolean; id: string }) {
   const C = DOODLES[name] ?? Rain;
-  const lite = useLite();
+  const lite = useContext(LiteContext);
   return (
-    <LiteContext.Provider value={lite}>
-      <span data-playing={active ? "true" : "false"} className="block h-full w-full">
-        <C active={active} id={id} lite={lite} />
-      </span>
-    </LiteContext.Provider>
+    <span data-playing={active ? "true" : "false"} className="block h-full w-full">
+      <C active={active} id={id} lite={lite} />
+    </span>
   );
 }

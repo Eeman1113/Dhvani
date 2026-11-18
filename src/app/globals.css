@@ -363,6 +363,20 @@ html { scroll-padding-top: 5rem; }
   .min-h-screen-d { min-height: 100dvh; }
 }
 
+/*
+ * Skip the work for cards that are not on screen.
+ *
+ * There are around ninety sound cards and at most a dozen are ever visible.
+ * `content-visibility: auto` lets the browser skip style, layout and paint
+ * for the rest, which on this page also means skipping their hand-drawn
+ * borders and every animation inside them. The intrinsic size keeps the
+ * scrollbar honest while they are skipped.
+ */
+.card-skip {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 168px;
+}
+
 /* ------------------------------------------------------------------ */
 /* the light tier                                                      */
 /* ------------------------------------------------------------------ */
@@ -384,8 +398,6 @@ html { scroll-padding-top: 5rem; }
    number of animated elements on the page. Lite keeps the first frame, so
    the lines are still drawn by hand, they just hold still. */
 [data-perf="lite"] .boil-0 { animation: none !important; opacity: 1 !important; }
-[data-perf="lite"] .boil-1,
-[data-perf="lite"] .boil-2 { animation: none !important; opacity: 0 !important; }
 
 /* Continuous decorative motion. Lite keeps these only inside a card that is
    actually playing, which is usually a handful of elements rather than a
@@ -423,13 +435,21 @@ html { scroll-padding-top: 5rem; }
 [data-perf="lite"] body::before { opacity: 0.32; mix-blend-mode: normal; }
 [data-perf="lite"] body::after { display: none; }
 
-/* Eighty-five permanently promoted compositor layers, each one a texture the
-   CPU has to allocate and blend when there is no GPU to do it. */
-[data-perf="lite"] .will-change-transform { will-change: auto !important; }
+/* The promoted layers are not overridden here; the class is simply not
+   applied in lite. Cancelling it with !important would leave the element
+   promoted-then-unpromoted and still lose subpixel text antialiasing. */
 
-/* Transitions on colour across a hundred cards at once are a lot of style
-   recalculation for something nobody is watching closely. */
-[data-perf="lite"] * { transition-duration: 180ms !important; }
+/*
+ * Scoped, not universal.
+ *
+ * This was written as `[data-perf="lite"] *` and that was a bad mistake: it
+ * put a 180 ms transition on every one of ~5300 elements, so a theme switch
+ * or a card activation animated the entire document. Measured, it took the
+ * light tier from 52 ms a frame to 110 ms during those moments, which is the
+ * exact opposite of the point. Only the things that actually change colour
+ * need a duration.
+ */
+[data-perf="lite"] .transition-colors { transition-duration: 180ms; }
 
 /* The hand still shakes when you touch something; it just does not shake
    continuously everywhere. */

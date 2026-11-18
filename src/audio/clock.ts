@@ -30,12 +30,25 @@ export type Filler = (from: number, to: number) => void;
  * pause; anything longer than this is not a backlog, it is a silent hole in
  * every voice at once.
  *
- * Eight seconds, because on a machine with no GPU acceleration a single
- * frame of this page can take most of a second, and a run of them can take
- * several. Measured: at ninety percent main-thread occupancy a four second
- * window already held, but it left nothing spare, and the first report of
- * the music stopping came from exactly that machine. The cost of a wider
- * window is only that a fader change takes slightly longer to be heard.
+ * Eight seconds, as insurance rather than as the fix.
+ *
+ * Worth being precise about the failure this guards against, because the
+ * obvious reading is wrong. The music stopping on a slow machine was not a
+ * single long stall overrunning the window: profiling put the longest
+ * main-thread block at 49 ms and the worst worker-tick lateness at 113 ms,
+ * both of which a four second window absorbs easily.
+ *
+ * The real mechanism was sustained occupancy. The full tier was spending
+ * roughly 480 ms of main-thread rendering per second of wall clock, so on a
+ * machine several times slower the main thread is oversubscribed and the
+ * window drains faster than it can be refilled. Against that, window length
+ * only changes how long it takes to empty: four seconds and eight seconds
+ * both run dry. The thing that actually fixed it was drawing less, which is
+ * what the light tier does.
+ *
+ * The wider window is still worth having, because it costs nothing except a
+ * fader change taking slightly longer to be heard, and it comfortably covers
+ * every single stall that was actually observed.
  */
 const LOOKAHEAD = 8.0;
 const TICK_MS = 120;

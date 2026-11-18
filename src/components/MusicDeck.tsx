@@ -6,6 +6,7 @@ import { RoughBorder } from "@/components/Rough";
 import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
 import { useMotion } from "@/lib/useMotion";
+import { useLite } from "@/lib/perf";
 import { musicNowPlaying, rerollMusic } from "@/audio/mixer";
 import type { DeckMode } from "@/audio/lofi/engine";
 
@@ -116,6 +117,7 @@ function ModeCard({
   onLevel: (v: number) => void;
   onReroll: () => void;
 }) {
+  const lite = useLite();
   const ref = useMotion<HTMLDivElement>({
     active,
     band: mode.id === "lofi" ? "bass" : "mid",
@@ -128,7 +130,7 @@ function ModeCard({
   });
 
   return (
-    <div ref={ref} className="relative will-change-transform">
+    <div ref={ref} className={`relative ${lite ? "" : "will-change-transform"}`}>
       <div
         className="relative flex gap-4 rounded-[18px] px-4 py-4 transition-colors duration-500"
         style={{ background: active ? "var(--wash)" : "var(--paper-2)" }}

@@ -5,6 +5,7 @@ import { Doodle } from "@/components/doodles";
 import { RoughBorder } from "@/components/Rough";
 import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
+import { useLite } from "@/lib/perf";
 import { useMotion } from "@/lib/useMotion";
 import type { Sound } from "@/audio/catalogue";
 
@@ -12,6 +13,9 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
   const level = useDhvani((s) => s.levels[sound.id] ?? 0);
   const setSound = useDhvani((s) => s.setSound);
   const active = level > 0;
+  // Promoting ninety cards to their own compositor layer is a real cost
+  // without a GPU, and it also disables subpixel text antialiasing.
+  const lite = useLite();
   const [showNote, setShowNote] = useState(false);
 
   // The whole card has weight. Active cards ride the mix; idle ones just
@@ -28,7 +32,10 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
   });
 
   return (
-    <div ref={ref} className="relative will-change-transform">
+    <div
+      ref={ref}
+      className={`card-skip relative ${lite ? "" : "will-change-transform"}`}
+    >
       <div
         className="relative flex flex-col items-center gap-2 rounded-[18px] px-3 pb-3 pt-4 transition-colors duration-500"
         style={{
