@@ -124,8 +124,10 @@ and re-encoded; `AUDIO_SOURCES.md` records exactly what was done to each file.
 
 ### Art and code
 
-- The logo is the word **ध्वनि** written in felt tip by **Eeman Majumder**,
-  photographed, cut out of its background and traced to vector.
+- The logo is the word **ध्वनि** handwritten in felt tip by
+  **[Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/)**,
+  photographed, cut out of its background and traced to vector. The waver in
+  the shirorekha is hers; none of the letterforms have been corrected.
 - The painted background art (clouds, mist, mountains, moon, enso, leaves,
   birds) was generated with an image model, then cut apart, graded per theme and
   parallaxed by hand.
@@ -137,4 +139,5 @@ and re-encoded; `AUDIO_SOURCES.md` records exactly what was done to each file.
 ## Licence
 
 Code is MIT. The field recordings are CC0 and carry no conditions. The logo is
-Eeman Majumder's own handwriting; please do not pass it off as your own.
+[Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/)'s handwriting,
+used with permission; please do not pass it off as your own.

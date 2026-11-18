@@ -53,24 +53,32 @@ export function getTier(): Tier {
   return state.tier;
 }
 
-export function setTier(tier: Tier, remember = true) {
-  if (remember && typeof localStorage !== "undefined") {
+export function setTier(tier: Tier, persist = true) {
+  if (persist && typeof localStorage !== "undefined") {
     try {
       localStorage.setItem(KEY, tier);
     } catch {
       /* private mode */
     }
+    // Any deliberate choice, from the dialog or from the toggle, closes the
+    // question for good.
+    remember();
   }
   set({ tier, shouldOffer: false });
 }
 
 export function dismissOffer() {
+  remember();
+  set({ shouldOffer: false });
+}
+
+/** Marks the question as settled, so it is never asked again. */
+function remember() {
   try {
     localStorage.setItem(ASKED, "1");
   } catch {
     /* private mode */
   }
-  set({ shouldOffer: false });
 }
 
 /* ------------------------------------------------------------------ */
@@ -110,11 +118,16 @@ function hardwareSuspicion(): number {
 }
 
 /**
- * Watches real frames and decides whether this machine is coping.
+ * Watches real frames and decides whether to *offer* the lighter tier.
  *
- * Deliberately measured rather than sniffed: the only thing that matters is
- * whether frames are actually landing on time on this machine, in this
- * window, with this mix playing.
+ * Measured rather than sniffed: the only thing that matters is whether
+ * frames are actually landing on time on this machine, in this window.
+ *
+ * It offers, once, and never acts. The tier only ever changes because
+ * somebody chose it, and once they have chosen, this stops looking: a
+ * person who said no should not be asked again every time they open a tab,
+ * and a person who said yes should not have it quietly undone the next time
+ * the page happens to measure well.
  */
 export function startWatching() {
   if (typeof window === "undefined") return;
@@ -156,13 +169,16 @@ export function startWatching() {
     return;
   }
 
+  /*
+   * Nothing here ever switches tier by itself.
+   *
+   * The hardware hints only lower the bar for *offering*; the page always
+   * starts in the full tier and stays there until a person says otherwise.
+   * Deciding on someone's behalf that they get the reduced version, based on
+   * a core count and a missing WebGL context, is a guess being applied to
+   * the thing they actually came for.
+   */
   const suspicion = hardwareSuspicion();
-  if (suspicion >= 4) {
-    // Unambiguous: no GPU and few cores. Start light rather than showing a
-    // janky page first and then asking about it.
-    set({ tier: "lite" });
-    return;
-  }
 
   applyToDocument();
 

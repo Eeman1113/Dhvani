@@ -391,9 +391,19 @@ export default function Credits() {
           <Section id="made" title="Everything else" jp="他">
             <Card seed="c-logo">
               <Term word="The logo">
-                the word ध्वनि, written in felt-tip on a sheet of paper by Eeman
-                Majumder, photographed, cut out of its background and traced to
-                vector. The waver in the shirorekha is the real one.
+                the word ध्वनि, written in felt-tip on a sheet of paper by{" "}
+                <a
+                  href="https://www.linkedin.com/in/sakshi-sawarkar/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tap underline-offset-4 hover:underline"
+                  style={{ color: "var(--accent-text)" }}
+                >
+                  Sakshi Sawarkar
+                </a>
+                . It is her handwriting, photographed, cut out of its background
+                and traced to vector. The waver in the shirorekha is the real
+                one, and nothing about the letterforms has been corrected.
               </Term>
             </Card>
             <Card seed="c-art">
@@ -442,7 +452,17 @@ export default function Credits() {
               back to the machine
             </Link>
             <p className="text-[0.78rem]" style={{ color: "var(--ink-soft)" }}>
-              Made by Eeman Majumder.
+              Made by Eeman Majumder. The mark is{" "}
+              <a
+                href="https://www.linkedin.com/in/sakshi-sawarkar/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline-offset-4 hover:underline"
+                style={{ color: "var(--accent-text)" }}
+              >
+                Sakshi Sawarkar
+              </a>
+              &apos;s handwriting.
             </p>
           </footer>
         </main>
