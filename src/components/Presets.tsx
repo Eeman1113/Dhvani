@@ -13,7 +13,7 @@ export function Presets() {
         <h2 id="presets-heading" className="hand text-xl leading-none" style={{ color: "var(--ink)" }}>
           Start somewhere
         </h2>
-        <span className="jp text-sm leading-none" style={{ color: "var(--accent)" }}>
+        <span className="jp text-sm leading-none" style={{ color: "var(--accent-text)" }}>
           下地
         </span>
       </header>
@@ -53,20 +53,29 @@ function PresetCard({
       ref={ref}
       type="button"
       onClick={onClick}
-      className="relative px-3 py-3 text-left transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
-      style={{ background: "var(--paper-2)", borderRadius: 16 }}
+      // No transition or hover transform here: useMotion rewrites this
+      // element's inline transform every frame, inline beats the class, and a
+      // transition on a property being rewritten at 60 Hz restarts forever.
+      // The press and hover live on the inner wrapper instead.
+      className="group relative block text-left"
+      style={{ borderRadius: 16 }}
     >
+      <span
+        className="relative block rounded-[16px] px-3 py-3 transition-transform duration-200 group-hover:-translate-y-[3px] group-active:scale-95"
+        style={{ background: "var(--paper-2)" }}
+      >
       <RoughBorder seedKey={`preset-${id}`} radius={16} stroke="var(--ink)" strokeWidth={1.6} opacity={0.42} />
       <span className="relative z-10 flex items-baseline gap-1.5">
         <span className="hand text-base" style={{ color: "var(--ink)" }}>
           {name}
         </span>
-        <span className="jp text-[0.6rem]" style={{ color: "var(--accent)" }}>
+        <span className="jp text-[0.6rem]" style={{ color: "var(--accent-text)" }}>
           {jp}
         </span>
       </span>
       <span className="relative z-10 mt-1 block text-[0.7rem] leading-snug" style={{ color: "var(--ink-soft)" }}>
         {blurb}
+      </span>
       </span>
     </button>
   );

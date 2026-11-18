@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
-import { RoughBorder } from "@/components/Rough";
+import { RoughBorder, RoughCircle } from "@/components/Rough";
+import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
 import { THEMES } from "@/lib/themes";
 
@@ -16,10 +17,11 @@ function Timer() {
   const [open, setOpen] = useState(false);
   const [left, setLeft] = useState<number | null>(null);
   const fired = useRef(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const popRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!timerEndsAt) {
-      setLeft(null);
       fired.current = false;
       return;
     }
@@ -32,23 +34,59 @@ function Timer() {
         setTimer(null);
       }
     };
-    tick();
     const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
+    tick();
+    return () => {
+      clearInterval(id);
+      setLeft(null);
+    };
   }, [timerEndsAt, clear, setTimer]);
 
+  // Clamped: tick() sets the value before the <= 0 branch clears it, so an
+  // unclamped render could flash "-1h 0m" on the way out.
+  const ms = left === null ? null : Math.max(0, left);
   const label =
-    left === null
+    ms === null
       ? "timer"
-      : `${Math.floor(left / 3600000)}h ${Math.floor((left % 3600000) / 60000)}m`;
+      : ms >= 3600000
+        ? `${Math.floor(ms / 3600000)}h ${Math.floor((ms % 3600000) / 60000)}m`
+        : ms >= 60000
+          ? `${Math.floor(ms / 60000)}m`
+          : `${Math.ceil(ms / 1000)}s`;
+
+  const close = useCallback(() => setOpen(false), []);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        close();
+        triggerRef.current?.focus();
+      }
+    };
+    const onDown = (e: PointerEvent) => {
+      if (!popRef.current?.contains(e.target as Node) && !triggerRef.current?.contains(e.target as Node)) {
+        close();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onDown);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onDown);
+    };
+  }, [open, close]);
 
   return (
     <div className="relative">
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="relative px-3 py-1.5 transition-transform active:scale-95"
         aria-expanded={open}
+        aria-haspopup="menu"
+        aria-controls="timer-menu"
+        aria-label={ms === null ? "Set a sleep timer" : `Sleep timer, ${label} left`}
       >
         <RoughBorder
           seedKey="timer-btn"
@@ -64,6 +102,9 @@ function Timer() {
 
       {open && (
         <div
+          ref={popRef}
+          id="timer-menu"
+          role="menu"
           className="absolute right-0 top-full z-50 mt-2 flex w-44 flex-col gap-1 rounded-2xl p-2"
           style={{ background: "var(--paper-2)", boxShadow: "0 8px 28px -12px rgba(0,0,0,0.3)" }}
         >
@@ -76,6 +117,7 @@ function Timer() {
                 setTimer(m);
                 setOpen(false);
               }}
+              role="menuitem"
               className="relative z-10 rounded-lg px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--paper-3)]"
               style={{ color: "var(--ink)" }}
             >
@@ -90,6 +132,7 @@ function Timer() {
               setTimer(null);
               setOpen(false);
             }}
+            role="menuitem"
             className="relative z-10 rounded-lg px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--paper-3)]"
             style={{ color: "var(--ink-soft)" }}
           >
@@ -105,7 +148,7 @@ function ThemeSwitcher() {
   const theme = useDhvani((s) => s.theme);
   const setTheme = useDhvani((s) => s.setTheme);
   return (
-    <div className="flex items-center gap-1.5" role="group" aria-label="Paper">
+    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Paper">
       {THEMES.map((t) => {
         const on = t.id === theme;
         return (
@@ -116,18 +159,34 @@ function ThemeSwitcher() {
             title={`${t.name} ${t.jp}, ${t.mood}`}
             aria-label={`${t.name} theme`}
             aria-pressed={on}
-            className="relative h-6 w-6 rounded-full transition-transform duration-200 hover:scale-125"
-            style={{
-              background: t.colors.paper,
-              border: `2px solid ${on ? t.colors.accent : t.colors.line}`,
-              transform: on ? "scale(1.22)" : undefined,
-              boxShadow: on ? `0 0 0 2px color-mix(in oklab, ${t.colors.accent} 35%, transparent)` : undefined,
-            }}
+            className="relative h-7 w-7 transition-transform duration-200 hover:scale-115"
+            style={{ transform: on ? "scale(1.18)" : undefined }}
           >
-            <span
-              className="absolute inset-[3px] rounded-full"
-              style={{ background: t.colors.accent, opacity: on ? 1 : 0.5 }}
-            />
+            {/* Drawn, not geometric. These sit in the top bar permanently and
+                were the one component opting out of the whole drawing system. */}
+            <svg viewBox="0 0 28 28" className="h-full w-full overflow-visible">
+              <RoughCircle
+                cx={14}
+                cy={14}
+                r={11}
+                seedKey={`sw-${t.id}`}
+                stroke={on ? t.colors.accent : t.colors.line}
+                fill={t.colors.paper}
+                strokeWidth={on ? 2.4 : 1.8}
+                amp={1}
+              />
+              <RoughCircle
+                cx={14}
+                cy={14}
+                r={5.5}
+                seedKey={`swi-${t.id}`}
+                stroke="none"
+                fill={t.colors.accent}
+                strokeWidth={0}
+                amp={0.9}
+                opacity={on ? 1 : 0.55}
+              />
+            </svg>
           </button>
         );
       })}
@@ -138,10 +197,10 @@ function ThemeSwitcher() {
 export function TopBar() {
   const master = useDhvani((s) => s.master);
   const setMaster = useDhvani((s) => s.setMaster);
-  const levels = useDhvani((s) => s.levels);
-  const music = useDhvani((s) => s.music);
   const clear = useDhvani((s) => s.clear);
-  const playing = Object.keys(levels).length + (music ? 1 : 0);
+  // A count, not the object: a fresh levels object on every change re-rendered
+  // the whole header, logo and border included, on every drag frame.
+  const playing = useDhvani((s) => Object.keys(s.levels).length + (s.music ? 1 : 0));
 
   return (
     <header
@@ -156,21 +215,21 @@ export function TopBar() {
           </span>
         </Link>
 
-        <div className="ml-auto flex items-center gap-4">
-          <label className="hidden items-center gap-2 sm:flex">
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-x-4 gap-y-2">
+          {/* The only way to pull everything down without losing the mix, so
+              it cannot be the thing that disappears on a phone. */}
+          <label className="order-last flex basis-full items-center gap-2 sm:order-none sm:basis-auto">
             <span className="hand text-sm" style={{ color: "var(--ink-soft)" }}>
               all
             </span>
-            <input
-              type="range"
-              min={0}
-              max={1}
-              step={0.01}
-              value={master}
-              onChange={(e) => setMaster(Number(e.target.value))}
-              className="ink-slider w-28"
-              aria-label="Master volume"
-            />
+            <span className="w-full sm:w-28">
+              <InkSlider
+                value={master}
+                onChange={setMaster}
+                seed="master"
+                label="Master volume"
+              />
+            </span>
           </label>
 
           <ThemeSwitcher />

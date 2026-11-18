@@ -33,11 +33,12 @@ function Frames({
   strokeWidth: number;
   opacity: number;
 }) {
+  const strokeless = stroke === "none" || strokeWidth === 0;
   return (
     <>
       {frames.map((paths, i) => (
         <g key={i} className={`boil-${i}`} opacity={opacity}>
-          {paths.map((d, k) => (
+          {(strokeless ? paths.slice(0, 1) : paths).map((d, k) => (
             <path
               key={k}
               d={d}
@@ -137,13 +138,19 @@ export function RoughBorder({
   useEffect(() => {
     const host = ref.current?.parentElement;
     if (!host) return;
-    const ro = new ResizeObserver(() => {
-      const r = host.getBoundingClientRect();
-      // Snapped to 4 px so a drag-resize does not regenerate the path on
-      // every single frame.
-      const w = Math.max(16, Math.round(r.width / 4) * 4);
-      const h = Math.max(16, Math.round(r.height / 4) * 4);
-      setSize((prev) => (prev && prev.w === w && prev.h === h ? prev : { w, h }));
+    const ro = new ResizeObserver((entries) => {
+      // The observer already measured; calling getBoundingClientRect here
+      // would force a second layout read inside every one of these callbacks.
+      const r = entries[0]?.borderBoxSize?.[0];
+      const rw = r ? r.inlineSize : host.offsetWidth;
+      const rh = r ? r.blockSize : host.offsetHeight;
+      // Snapped to 8 px with a dead band, so a height transition does not
+      // regenerate the path on every intermediate frame.
+      const w = Math.max(16, Math.round(rw / 8) * 8);
+      const h = Math.max(16, Math.round(rh / 8) * 8);
+      setSize((prev) =>
+        prev && Math.abs(prev.w - w) < 9 && Math.abs(prev.h - h) < 9 ? prev : { w, h },
+      );
     });
     ro.observe(host);
     return () => ro.disconnect();
@@ -162,7 +169,11 @@ export function RoughBorder({
           w={size.w}
           h={size.h}
           r={radius}
-          seedKey={`${seedKey}:${size.w}x${size.h}`}
+          // The size is deliberately NOT part of the seed. With it in, every
+          // step of an expand animation drew a different hand, so the outline
+          // visibly re-sketched itself eight times on a single click. Out of
+          // it, the same hand simply draws a taller box.
+          seedKey={seedKey}
           stroke={stroke}
           fill={fill}
           strokeWidth={strokeWidth}

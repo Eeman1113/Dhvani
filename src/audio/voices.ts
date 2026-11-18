@@ -529,6 +529,10 @@ function stream(): Voice {
         s.buffer = buf;
         const f = filt(ctx, "bandpass", rand(500, 1400), rand(12, 26));
         const dur = rand(0.04, 0.13);
+        // Anchor first. A ramp with no preceding event starts from the value
+        // at the moment of the call, which is up to a full lookahead window
+        // before t, so the sweep would finish before the burst ever played.
+        f.frequency.setValueAtTime(f.frequency.value, t);
         f.frequency.exponentialRampToValueAtTime(rand(900, 2600), t + dur);
         const g = ctx.createGain();
         g.gain.setValueAtTime(0.0001, t);

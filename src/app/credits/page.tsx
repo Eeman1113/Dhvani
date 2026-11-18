@@ -28,7 +28,7 @@ function Section({
         <h2 id={`${id}-h`} className="hand text-2xl leading-none" style={{ color: "var(--ink)" }}>
           {title}
         </h2>
-        <span className="jp text-base leading-none" style={{ color: "var(--accent)" }}>
+        <span className="jp text-base leading-none" style={{ color: "var(--accent-text)" }}>
           {jp}
         </span>
       </header>
@@ -54,7 +54,7 @@ function Term({ word, children }: { word: string; children: React.ReactNode }) {
       <strong className="hand text-[1.08rem]" style={{ color: "var(--ink)" }}>
         {word}
       </strong>
-      <span className="mx-2" style={{ color: "var(--accent)" }}>
+      <span className="mx-2" style={{ color: "var(--accent-text)" }}>
         /
       </span>
       {children}
@@ -103,7 +103,7 @@ export default function Credits() {
               ["recordings", "the recordings"],
               ["made", "everything else"],
             ].map(([id, label]) => (
-              <a key={id} href={`#${id}`} className="hand underline-offset-4 hover:underline" style={{ color: "var(--accent)" }}>
+              <a key={id} href={`#${id}`} className="hand underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
                 {label}
               </a>
             ))}
@@ -360,7 +360,7 @@ export default function Credits() {
                         target="_blank"
                         rel="noopener noreferrer"
                         className="underline-offset-4 hover:underline"
-                        style={{ color: "var(--accent)" }}
+                        style={{ color: "var(--accent-text)" }}
                       >
                         {c.license}
                       </a>
@@ -379,7 +379,7 @@ export default function Credits() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline-offset-4 hover:underline"
-                style={{ color: "var(--accent)" }}
+                style={{ color: "var(--accent-text)" }}
               >
                 Freesound
               </a>
@@ -438,7 +438,7 @@ export default function Credits() {
           </Section>
 
           <footer className="mt-20 flex flex-col items-center gap-3 text-center">
-            <Link href="/" className="hand text-base underline-offset-4 hover:underline" style={{ color: "var(--accent)" }}>
+            <Link href="/" className="hand text-base underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
               back to the machine
             </Link>
             <p className="text-[0.78rem]" style={{ color: "var(--ink-soft)" }}>

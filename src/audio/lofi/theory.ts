@@ -142,12 +142,17 @@ export const PENTATONIC = {
  */
 export function voice(rootMidi: number, quality: Quality, centre = 64): number[] {
   const tones = QUALITY[quality];
-  const notes = tones.slice(1).map((semi) => {
+  const notes: number[] = [];
+  for (const semi of tones.slice(1)) {
     let n = rootMidi + semi;
     while (n < centre - 7) n += 12;
     while (n > centre + 7) n -= 12;
-    return n;
-  });
+    // sus2 stacks a 2nd and a 9th, which fold onto the same pitch. Push the
+    // duplicate up an octave rather than dropping it and voicing a triad as
+    // two notes.
+    if (notes.includes(n)) n += 12;
+    notes.push(n);
+  }
   return Array.from(new Set(notes)).sort((a, b) => a - b);
 }
 

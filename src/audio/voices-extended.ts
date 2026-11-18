@@ -65,6 +65,12 @@ function drips(opts: { rate: number; space: number }): Voice {
   bus.connect(out);
   bus.connect(d);
   d.connect(gain(ctx, 0.5)).connect(out);
+  // A delay feeding itself is the one shape not to leave to the collector.
+  r.cleanup(() => {
+    d.disconnect();
+    fb.disconnect();
+    tone.disconnect();
+  });
 
   const st: PoissonState = { next: 0 };
   r.cleanup(
@@ -281,13 +287,9 @@ function leaves(): Voice {
   const bus = gain(ctx, 0.8);
   bus.connect(filt(ctx, "highpass", 900, 0.6)).connect(out);
 
-  // One shared walk decides how hard the wind is blowing right now, which the
-  // scheduler reads to decide how many leaves to move.
-  const gust = r.own(slowRandomLfo(ctx, 210, 0.09));
-  const gustGain = gain(ctx, 1);
-  gust.connect(gustGain);
-  gust.start();
-
+  // How hard the wind is blowing right now. An AudioParam LFO cannot be read
+  // from the main thread, and the scheduler needs the value to decide how
+  // many leaves to move, so the walk lives here in plain numbers instead.
   let intensity = 0.5;
   let phase = 0;
   const st: PoissonState = { next: 0 };
@@ -592,16 +594,15 @@ function flute(): Voice {
     s.connect(bf).connect(bg).connect(p);
     s.start(t, randomOffset(nb));
     s.stop(t + dur + 0.2);
+    // Ride the audio clock, not a timer: in a hidden tab these stay connected
+    // to a live graph until the throttled timeout finally fires.
     s.onended = () => {
       s.disconnect();
       bf.disconnect();
       bg.disconnect();
-    };
-
-    setTimeout(() => {
       env.disconnect();
       p.disconnect();
-    }, (t - ctx.currentTime + dur + 2) * 1000);
+    };
   };
 
   // A minor pentatonic in the low register, played slowly with long silences.
@@ -633,7 +634,9 @@ function rainstick(): Voice {
     subscribeClock((from, to) => {
       phase += (to - from) / 14;
       const density = 0.5 + 0.5 * Math.sin(phase);
-      poisson(st, from, to, 30 + density * 140, (t) => {
+      // Capped: beyond about 150/s the clock window guard starts
+      // truncating the tail, which reads as a dip at the busiest moment.
+      poisson(st, from, to, 25 + density * 120, (t) => {
         transient(ctx, bus, t, {
           freq: rand(2200, 8000),
           q: rand(6, 18),

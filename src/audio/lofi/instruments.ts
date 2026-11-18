@@ -24,6 +24,11 @@ export type Note = {
 
 type Ctx = { ctx: AudioContext; dest: AudioNode };
 
+/** When an envelope built by env() has finished, relative to its start. */
+function envEnd(attack: number, decay: number, release: number, dur: number) {
+  return Math.max(dur, attack + decay) + release;
+}
+
 function env(
   ctx: AudioContext,
   at: number,
@@ -110,11 +115,16 @@ export function piano({ ctx, dest }: Ctx, n: Note) {
   pan.pan.value = Math.max(-0.4, Math.min(0.4, (n.midi - 60) / 60));
   pan.connect(dest);
 
-  const amp = env(ctx, n.at, 0.004, 1.4, 0.22, 0.9, n.dur, 0.2 * n.vel);
+  // The envelope holds until max(dur, attack+decay) and only then releases,
+  // so a short Alberti note still rings for over two seconds. Stopping the
+  // oscillators at dur+1 cut it mid-sustain and clicked on every note.
+  const ATK = 0.004, DEC = 1.4, REL = 0.9;
+  const tail = envEnd(ATK, DEC, REL, n.dur) + 0.1;
+  const amp = env(ctx, n.at, ATK, DEC, 0.22, REL, n.dur, 0.2 * n.vel);
   const tone = ctx.createBiquadFilter();
   tone.type = "lowpass";
   tone.frequency.setValueAtTime(3200 + n.vel * 4000, n.at);
-  tone.frequency.exponentialRampToValueAtTime(900, n.at + n.dur + 0.8);
+  tone.frequency.exponentialRampToValueAtTime(900, n.at + tail);
   amp.connect(tone).connect(pan);
 
   // Piano partials are stretched sharp by string stiffness. Without the
@@ -128,10 +138,17 @@ export function piano({ ctx, dest }: Ctx, n: Note) {
     g.gain.value = (0.9 / (k * k)) * rand(0.8, 1.2);
     o.connect(g).connect(amp);
     o.start(n.at);
-    o.stop(n.at + n.dur + 1.0);
+    o.stop(n.at + tail);
     o.onended = () => {
       o.disconnect();
       g.disconnect();
+      // The last partial to finish takes the shared chain with it, so the
+      // teardown rides the audio clock instead of a throttled timer.
+      if (k === 6) {
+        amp.disconnect();
+        tone.disconnect();
+        pan.disconnect();
+      }
     };
     void i;
   });
@@ -151,11 +168,6 @@ export function piano({ ctx, dest }: Ctx, n: Note) {
   hs.start(n.at, randomOffset(nb), 0.08);
   kill(hs, [hf, hg]);
 
-  setTimeout(() => {
-    amp.disconnect();
-    tone.disconnect();
-    pan.disconnect();
-  }, (n.at - ctx.currentTime + n.dur + 2.5) * 1000);
 }
 
 /* ------------------------------------------------------------------ */
@@ -237,7 +249,14 @@ export function choir(
 
   // A soprano raises F1 toward the fundamental to stay resonant up high.
   const formantShift = Math.max(1, f / 350);
-  const cleanup: AudioNode[] = [amp, pan];
+  // Everything shaped by the formant bank meets here. The ring below has to
+  // sit AFTER this sum: a peaking filter passes its whole input and only
+  // boosts a band, so hanging it directly off amp would run the raw
+  // sawtooth straight into the output and drown the vowel it is shaping.
+  const mix = ctx.createGain();
+  mix.connect(pan);
+
+  const cleanup: AudioNode[] = [amp, pan, mix];
 
   for (const [freq, g, bw] of VOWELS[vowel]) {
     const bp = ctx.createBiquadFilter();
@@ -247,19 +266,27 @@ export function choir(
     bp.Q.value = cf / bw;
     const bg = ctx.createGain();
     bg.gain.value = g;
-    amp.connect(bp).connect(bg).connect(pan);
+    amp.connect(bp).connect(bg).connect(mix);
     cleanup.push(bp, bg);
   }
 
-  // The singer's formant: the 2.8 kHz ring that lets a voice carry over an
-  // orchestra. Without it the voice sits behind everything and sounds like a pad.
+  // The singer's formant: the ring near 2.8 kHz that lets a trained voice
+  // carry over an orchestra without amplification.
+  //
+  // It belongs in parallel with the others, fed from the source, because
+  // physically it is one more resonance of the tract (a clustering of the
+  // third, fourth and fifth formants), not a tone control on the finished
+  // vowel. It also has to be a bandpass: a peaking filter passes its whole
+  // input and merely boosts a band, so hanging one off the source ran the
+  // raw sawtooth straight to the output and drowned the vowel.
   const ring = ctx.createBiquadFilter();
-  ring.type = "peaking";
-  ring.frequency.value = 2850;
-  ring.Q.value = 2.2;
-  ring.gain.value = 7;
-  amp.connect(ring).connect(pan);
-  cleanup.push(ring);
+  ring.type = "bandpass";
+  ring.frequency.value = 2850 * rand(0.97, 1.03);
+  ring.Q.value = 4.5;
+  const ringGain = ctx.createGain();
+  ringGain.gain.value = 0.42;
+  amp.connect(ring).connect(ringGain).connect(mix);
+  cleanup.push(ring, ringGain);
 
   // Breath.
   const nb = noiseBuffer(ctx, "pink");
@@ -306,7 +333,10 @@ export function choir(
 
 export function strings({ ctx, dest }: Ctx, n: Note, spread = 3) {
   const f = mtof(n.midi);
-  const amp = env(ctx, n.at, Math.min(0.5, n.dur * 0.4), 0.4, 0.8, Math.min(1.4, n.dur * 0.6), n.dur, 0.055 * n.vel);
+  const ATK = Math.min(0.5, n.dur * 0.4);
+  const REL = Math.min(1.4, n.dur * 0.6);
+  const tail = envEnd(ATK, 0.4, REL, n.dur) + 0.15;
+  const amp = env(ctx, n.at, ATK, 0.4, 0.8, REL, n.dur, 0.055 * n.vel);
 
   const tone = ctx.createBiquadFilter();
   tone.type = "lowpass";
@@ -319,7 +349,6 @@ export function strings({ ctx, dest }: Ctx, n: Note, spread = 3) {
   pan.pan.value = rand(-0.55, 0.55);
   amp.connect(tone).connect(pan).connect(dest);
 
-  const nodes: AudioNode[] = [amp, tone, pan];
   for (let i = 0; i < spread; i++) {
     const o = ctx.createOscillator();
     o.type = "sawtooth";
@@ -339,7 +368,7 @@ export function strings({ ctx, dest }: Ctx, n: Note, spread = 3) {
     o.connect(g).connect(amp);
     o.start(n.at);
     v.start(n.at);
-    const end = n.at + n.dur + 1.8;
+    const end = n.at + tail;
     o.stop(end);
     v.stop(end);
     o.onended = () => {
@@ -347,12 +376,13 @@ export function strings({ ctx, dest }: Ctx, n: Note, spread = 3) {
       g.disconnect();
       v.disconnect();
       va.disconnect();
+      if (i === spread - 1) {
+        amp.disconnect();
+        tone.disconnect();
+        pan.disconnect();
+      }
     };
   }
-
-  setTimeout(() => {
-    for (const nd of nodes) nd.disconnect();
-  }, (n.at - ctx.currentTime + n.dur + 3) * 1000);
 }
 
 /* ------------------------------------------------------------------ */
@@ -368,7 +398,8 @@ export function harp({ ctx, dest }: Ctx, n: Note) {
   const amp = env(ctx, n.at, 0.003, 2.2, 0.05, 1.2, 0.02, 0.14 * n.vel);
   amp.connect(pan);
 
-  [1, 2, 3, 4.1, 5.2].forEach((k) => {
+  const PARTIALS = [1, 2, 3, 4.1, 5.2];
+  PARTIALS.forEach((k, idx) => {
     const o = ctx.createOscillator();
     o.type = "triangle";
     o.frequency.value = f * k;
@@ -376,10 +407,14 @@ export function harp({ ctx, dest }: Ctx, n: Note) {
     g.gain.value = 0.8 / (k * 1.5);
     o.connect(g).connect(amp);
     o.start(n.at);
-    o.stop(n.at + 3.2);
+    o.stop(n.at + 3.5);
     o.onended = () => {
       o.disconnect();
       g.disconnect();
+      if (idx === PARTIALS.length - 1) {
+        amp.disconnect();
+        pan.disconnect();
+      }
     };
   });
 
@@ -398,10 +433,6 @@ export function harp({ ctx, dest }: Ctx, n: Note) {
   s.start(n.at, randomOffset(nb), 0.06);
   kill(s, [bp, g]);
 
-  setTimeout(() => {
-    amp.disconnect();
-    pan.disconnect();
-  }, (n.at - ctx.currentTime + 4) * 1000);
 }
 
 /* ------------------------------------------------------------------ */

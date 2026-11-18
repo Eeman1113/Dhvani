@@ -21,7 +21,16 @@ import { getContext } from "./engine";
 /** Fill events into [from, to). Both are AudioContext timestamps, seconds. */
 export type Filler = (from: number, to: number) => void;
 
-const LOOKAHEAD = 2.0; // seconds of future we keep filled
+/**
+ * Seconds of future kept filled.
+ *
+ * The worker ticker is immune to timer throttling but the fill itself still
+ * runs on the main thread, because that is where the AudioContext lives. So
+ * the window has to be wide enough to ride out a long React commit or a GC
+ * pause; anything longer than this is not a backlog, it is a silent hole in
+ * every voice at once.
+ */
+const LOOKAHEAD = 4.0;
 const TICK_MS = 120;
 
 const fillers = new Set<Filler>();
@@ -59,15 +68,6 @@ function ensureTicker() {
   }
 }
 
-function stopTicker() {
-  worker?.postMessage({ cmd: "stop" });
-  worker?.terminate();
-  worker = null;
-  if (fallbackTimer) clearInterval(fallbackTimer);
-  fallbackTimer = null;
-  filledUntil = 0;
-}
-
 function tick() {
   if (fillers.size === 0) return;
   const ctx = getContext();
@@ -85,8 +85,13 @@ function tick() {
   for (const f of fillers) {
     try {
       f(from, target);
-    } catch {
-      /* one bad voice must not stop the rest of the mix */
+    } catch (err) {
+      // One bad voice must not stop the rest of the mix. But swallowing the
+      // error outright makes a scheduling bug look like silence, which is
+      // very hard to debug, so say so while developing.
+      if (process.env.NODE_ENV !== "production") {
+        console.error("[dhvani] clock filler threw:", err);
+      }
     }
   }
 }
@@ -96,7 +101,10 @@ export function subscribeClock(f: Filler): () => void {
   ensureTicker();
   return () => {
     fillers.delete(f);
-    if (fillers.size === 0) stopTicker();
+    // The ticker is deliberately left running. Several voices take no clock
+    // subscription at all, so tearing it down on the last unsubscribe meant
+    // building a new Blob worker, and eating an unfilled window, every time
+    // somebody switched from fire to wind.
   };
 }
 

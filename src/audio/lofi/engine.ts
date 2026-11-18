@@ -34,7 +34,6 @@ import {
   snare,
   hat,
   brush,
-  type Note,
   type Vowel,
 } from "./instruments";
 
@@ -95,9 +94,13 @@ export function createDeck(mode: DeckMode): Deck {
 
   const bank = mode === "lofi" ? PROGRESSIONS : CLASSICAL_PROGRESSIONS;
   let prog: Progression = pick(bank);
-  let root = randInt(mode === "lofi" ? 53 : 50, mode === "lofi" ? 60 : 57); // F3..C4 / D3..A3
+  // Lofi sits F3..C4, classical D3..A3. The clamp in onCycle has to use the
+  // same window, or the classical deck drifts up out of its string voicings.
+  const ROOT_LO = mode === "lofi" ? 53 : 50;
+  const ROOT_HI = mode === "lofi" ? 60 : 57;
+  let root = randInt(ROOT_LO, ROOT_HI);
   let bpm = mode === "lofi" ? rand(68, 84) : rand(54, 72);
-  let swing = mode === "lofi" ? rand(0.54, 0.6) : 0.5;
+  const swing = mode === "lofi" ? rand(0.54, 0.6) : 0.5;
 
   let bar = 0;
   let chordIdx = 0;
@@ -138,8 +141,8 @@ export function createDeck(mode: DeckMode): Deck {
       // Move to a closely related key. Fourths and fifths only, so it never
       // lurches.
       root += pick([5, -5, 7, -7, 2, -2]);
-      if (root > 62) root -= 12;
-      if (root < 48) root += 12;
+      if (root > ROOT_HI + 2) root -= 12;
+      if (root < ROOT_LO - 2) root += 12;
     }
     if (cycles % 6 === 0 && roll > 0.4) {
       prog = pick(bank);
@@ -320,16 +323,20 @@ export function createDeck(mode: DeckMode): Deck {
   /* --- clock ------------------------------------------------------- */
 
   const unsub = subscribeClock((from, to) => {
-    if (nextBar === 0) nextBar = from + 0.25;
+    // Clamp BEFORE scheduling, not after. A laptop waking from sleep leaves
+    // nextBar far behind the context clock, and clamping afterwards lets the
+    // whole guard's worth of bars through first: a few thousand nodes built
+    // synchronously, every envelope of them already in the past. The point is
+    // to drop the missed hour, not to play it all at once.
+    if (nextBar < from) nextBar = from + 0.25;
     const barLen = () => (60 / bpm) * 4;
+    // A bar is at least 2.8 s and the window is at most 2 s, so steady state
+    // needs one. Four is headroom, not a catch-up budget.
     let guard = 0;
-    while (nextBar < to && guard++ < 16) {
+    while (nextBar < to && guard++ < 4) {
       scheduleBar(nextBar);
       nextBar += barLen();
     }
-    // Recover from a suspended context or a sleeping laptop rather than
-    // trying to catch up on an hour of missed bars.
-    if (nextBar < from) nextBar = from + 0.25;
   });
 
   return {
@@ -345,7 +352,7 @@ export function createDeck(mode: DeckMode): Deck {
     },
     reroll() {
       prog = pick(bank);
-      root = randInt(mode === "lofi" ? 53 : 50, mode === "lofi" ? 60 : 57);
+      root = randInt(ROOT_LO, ROOT_HI);
       bpm = mode === "lofi" ? rand(68, 84) : rand(54, 72);
       chordIdx = 0;
       barInChord = 0;

@@ -38,10 +38,6 @@ let freqData: Uint8Array<ArrayBuffer> | null = null;
 /** Mutated in place every frame; read by the visual layer. Never replaced. */
 export const levels: Levels = { bass: 0, mid: 0, air: 0, rms: 0, hit: 0 };
 
-export function isStarted() {
-  return ctx !== null;
-}
-
 /** Idempotent. Safe to call from any user gesture. */
 export function getContext(): AudioContext {
   if (ctx) return ctx;
@@ -91,11 +87,6 @@ export function getMaster(): GainNode {
   return master!;
 }
 
-export function getAnalyser(): AnalyserNode {
-  getContext();
-  return analyser!;
-}
-
 export async function resume() {
   const c = getContext();
   if (c.state !== "running") {
@@ -108,16 +99,18 @@ export async function resume() {
 }
 
 export function setMasterVolume(v: number) {
-  const c = getContext();
+  getContext();
   ramp(master!.gain, clamp01(v), 0.08);
-  void c;
 }
 
 /* ------------------------------------------------------------------ */
 /* small shared helpers used all over the synthesis code               */
 /* ------------------------------------------------------------------ */
 
-export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+// Ordered so NaN falls through to 0. Written the obvious way round, NaN
+// passes both comparisons, reaches an AudioParam, and poisons the graph for
+// the rest of the session.
+export const clamp01 = (v: number) => (v >= 1 ? 1 : v > 0 ? v : 0);
 
 /** Click-free parameter move. The only way gains are allowed to change. */
 export function ramp(p: AudioParam, value: number, seconds = 0.05) {
@@ -162,6 +155,10 @@ export function subscribeFrame(fn: Sub): () => void {
   startLoop();
   return () => {
     subs.delete(fn);
+    if (subs.size === 0 && rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
   };
 }
 
@@ -170,6 +167,12 @@ function startLoop() {
   let prev = performance.now();
 
   const tick = (now: number) => {
+    if (subs.size === 0) {
+      // Nothing is listening. Stop rather than reading the analyser sixty
+      // times a second for the rest of the page's life.
+      rafId = 0;
+      return;
+    }
     rafId = requestAnimationFrame(tick);
     const dt = Math.min((now - prev) / 1000, 0.05);
     prev = now;

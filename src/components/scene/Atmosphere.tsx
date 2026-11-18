@@ -1,8 +1,19 @@
 "use client";
 
+/*
+ * next/image is deliberately not used in this file.
+ *
+ * The build is a static export with image optimisation off, so next/image
+ * would add a wrapper and a layout pass and change nothing about the bytes.
+ * These are also decorative layers whose size is driven by CSS and whose
+ * transforms are written every frame, which is exactly the case next/image
+ * is worst at.
+ */
+/* eslint-disable @next/next/no-img-element */
+
 import { useEffect, useRef } from "react";
 import { subscribeFrame, type Levels } from "@/audio/engine";
-import { signals } from "@/lib/signals";
+import { signals, refreshSignals, stepSignals } from "@/lib/signals";
 import { Particles } from "./Particles";
 import { asset } from "@/lib/asset";
 
@@ -44,7 +55,6 @@ const MISTS = [
 ];
 
 export function Atmosphere() {
-  const root = useRef<HTMLDivElement>(null);
   const sky = useRef<HTMLDivElement>(null);
   const mountains = useRef<HTMLDivElement>(null);
   const enso = useRef<HTMLDivElement>(null);
@@ -70,6 +80,12 @@ export function Atmosphere() {
     };
     window.addEventListener("pointermove", onMove, { passive: true });
 
+    let viewportWidth = window.innerWidth;
+    const onResize = () => {
+      viewportWidth = window.innerWidth;
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+
     let scroll = 0;
     const onScroll = () => {
       scroll = window.scrollY;
@@ -81,13 +97,29 @@ export function Atmosphere() {
     let birdTimer = 12;
     let birdFlight = -1;
 
+    let refreshIn = 0;
+
     const step = (levels: Levels, dt: number) => {
+      // The signal clock lives here rather than in the particle layer, because
+      // the atmosphere always renders and the particles opt out under reduced
+      // motion. Colour and light are not motion and should survive that.
+      refreshIn -= dt;
+      if (refreshIn <= 0) {
+        refreshSignals();
+        refreshIn = 0.4;
+      }
+      stepSignals(dt);
+
       const s = signals;
       px += (tx - px) * Math.min(1, dt * 2.5);
       py += (ty - py) * Math.min(1, dt * 2.5);
 
-      const vw = window.innerWidth;
-      const breath = levels.rms;
+      const vw = viewportWidth;
+      const breath = reduced ? 0 : levels.rms;
+      if (reduced) {
+        px = 0;
+        py = 0;
+      }
 
       /* --- sky ----------------------------------------------------- */
       if (sky.current) {
@@ -107,8 +139,10 @@ export function Atmosphere() {
 
       /* --- mountains ----------------------------------------------- */
       if (mountains.current) {
-        const show = Math.max(s.forest * 0.9, s.wind * 0.8, s.zen * 0.7, s.snow) * (1 - s.indoors * 0.7);
-        mountains.current.style.opacity = (show * 0.26).toFixed(3);
+        // There is always a horizon. It just comes forward when the mix turns
+        // outdoor, and recedes when you shut the window.
+        const show = 0.42 + Math.max(s.forest * 0.9, s.wind * 0.8, s.zen * 0.7, s.snow) * 0.58;
+        mountains.current.style.opacity = (show * 0.3 * (1 - s.indoors * 0.6)).toFixed(3);
         mountains.current.style.transform =
           `translate3d(${(-px * 8).toFixed(1)}px, ${(scroll * 0.03 - breath * 3).toFixed(1)}px, 0)`;
       }
@@ -121,8 +155,8 @@ export function Atmosphere() {
         if (!reduced) mistDrift[i] += windSpeed * dt;
         const span = vw + 900;
         const x = -450 + (((mistDrift[i] % span) + span) % span);
-        const show = Math.max(s.rain * 0.7, s.night * 0.5, s.water * 0.45, s.snow * 0.8);
-        el.style.opacity = (show * 0.22).toFixed(3);
+        const show = 0.3 + Math.max(s.rain * 0.7, s.night * 0.5, s.water * 0.45, s.snow * 0.8) * 0.7;
+        el.style.opacity = (show * 0.2).toFixed(3);
         el.style.transform =
           `translate3d(${(x - vw / 2 - px * 14 * m.depth).toFixed(1)}px, ${(scroll * 0.05 * m.depth - py * 8 * m.depth).toFixed(1)}px, 0)`;
       });
@@ -146,17 +180,17 @@ export function Atmosphere() {
         // Scaled by depth, so the near clouds read nearer. Five layers at one
         // opacity is a sticker sheet; five at different ones is a sky.
         el.style.opacity = (
-          (0.13 + s.rain * 0.2 + s.wind * 0.1 + s.activity * 0.06) *
+          (0.4 + s.rain * 0.3 + s.wind * 0.14 + s.activity * 0.1) *
           (1.25 - par * 0.75) *
-          (1 - s.indoors * 0.8) *
-          (1 - s.night * 0.3)
+          (1 - s.indoors * 0.72) *
+          (1 - s.night * 0.28)
         ).toFixed(3);
       });
 
       /* --- enso ----------------------------------------------------- */
       if (enso.current) {
         const show = Math.max(s.zen, s.activity * 0.22);
-        enso.current.style.opacity = (show * 0.1).toFixed(3);
+        enso.current.style.opacity = (0.05 + show * 0.1).toFixed(3);
         enso.current.style.transform =
           `translate3d(-50%, calc(-50% + ${(scroll * 0.12).toFixed(1)}px), 0) rotate(${(performance.now() / 900).toFixed(2)}deg) scale(${(1 + breath * 0.06 + s.zen * 0.1).toFixed(4)})`;
       }
@@ -185,7 +219,9 @@ export function Atmosphere() {
 
       /* --- birds ---------------------------------------------------- */
       if (birds.current) {
-        if (birdFlight < 0) {
+        if (reduced) {
+          birds.current.style.opacity = "0";
+        } else if (birdFlight < 0) {
           birdTimer -= dt * (0.2 + s.forest * 2.4);
           if (birdTimer <= 0 && s.forest > 0.25) {
             birdFlight = 0;
@@ -214,13 +250,21 @@ export function Atmosphere() {
       unsub();
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
   return (
-    <div ref={root} className="pointer-events-none fixed inset-0 overflow-hidden"
-      style={{ zIndex: 0, filter: "var(--art-grade, none)" }} aria-hidden>
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }} aria-hidden>
       <div ref={sky} className="absolute inset-0" style={{ transition: "none" }} />
+
+      {/*
+        Only the painted layers are graded. They were all painted on white, so
+        each paper needs its own grade or they sit on the page like stickers.
+        The particles below are drawn in the theme's own ink and accent, so
+        grading them a second time just turns white snow into grey grit.
+      */}
+      <div className="absolute inset-0" style={{ filter: "var(--art-grade, none)" }}>
 
       {/* mountains, sitting on the bottom edge */}
       <div ref={mountains} className="absolute bottom-0 left-0 w-full" style={{ opacity: 0 }}>
@@ -288,6 +332,8 @@ export function Atmosphere() {
         <img src={asset("/art/bird-far.webp")} alt="" className="inline-block w-9" draggable={false} />
         <img src={asset("/art/bird-far.webp")} alt="" className="ml-7 inline-block w-6 translate-y-5" draggable={false} />
         <img src={asset("/art/bird-far.webp")} alt="" className="ml-5 inline-block w-7 -translate-y-3" draggable={false} />
+      </div>
+
       </div>
 
       <Particles />

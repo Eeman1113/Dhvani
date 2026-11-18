@@ -51,8 +51,7 @@ export function LogoDrawIn({ height = 110 }: { height?: number }) {
       viewBox={LOGO_VIEWBOX}
       style={{ height, width: (height * 809) / 553 }}
       className="text-ink"
-      role="img"
-      aria-label="Dhvani"
+      aria-hidden
     >
       <path
         d={LOGO_PATH}

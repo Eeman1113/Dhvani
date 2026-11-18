@@ -47,6 +47,15 @@ export type Theme = {
     line: string;
     /** The one saturated colour. Active sounds, sliders, highlights. */
     accent: string;
+    /**
+     * The accent, darkened until it clears 4.5:1 on the paper.
+     *
+     * The decorative accent is chosen to look right as a stroke or a fill,
+     * which on a pale paper means it is nowhere near readable as 12px text.
+     * Rather than compromise the palette, text gets its own value. Use
+     * `accent` for anything drawn and `accentText` for anything read.
+     */
+    accentText: string;
     /** Secondary accent for the lofi deck and warm states. */
     accent2: string;
     /** Wash behind an active card. */
@@ -64,14 +73,15 @@ export const THEMES: Theme[] = [
     art: "saturate(0.72) hue-rotate(-12deg) brightness(1.02)",
     colors: {
       paper: "#fdeff2",
-      paper2: "#fbe4ea",
-      paper3: "#f6d6de",
+      paper2: "#fbdbe2",
+      paper3: "#fac1ce",
       ink: "#4a3540",
-      inkSoft: "#8d7480",
-      line: "#e8c3cf",
+      inkSoft: "#65535c",
+      line: "#f3b1bf",
       accent: "#d58fa6",
+      accentText: "#913654",
       accent2: "#b0869f",
-      wash: "#f7d3dd",
+      wash: "#ead2da",
     },
   },
   {
@@ -83,14 +93,15 @@ export const THEMES: Theme[] = [
     art: "saturate(0.6) hue-rotate(38deg) brightness(1.0)",
     colors: {
       paper: "#eef3e4",
-      paper2: "#e4ecd6",
-      paper3: "#d7e3c5",
+      paper2: "#e5edd5",
+      paper3: "#d9e6c1",
       ink: "#39412f",
-      inkSoft: "#72806a",
-      line: "#c8d6b5",
+      inkSoft: "#576151",
+      line: "#cfdcb4",
       accent: "#88a86f",
+      accentText: "#4f663d",
       accent2: "#7eb3a0",
-      wash: "#d9e7c8",
+      wash: "#d2e0c7",
     },
   },
   {
@@ -102,14 +113,15 @@ export const THEMES: Theme[] = [
     art: "saturate(0.8) hue-rotate(-6deg) brightness(1.02)",
     colors: {
       paper: "#e9f3f4",
-      paper2: "#dcecef",
-      paper3: "#cbe0e5",
+      paper2: "#daeced",
+      paper3: "#c7e2e5",
       ink: "#2c4047",
-      inkSoft: "#647d85",
-      line: "#b9d6dc",
+      inkSoft: "#4f6269",
+      line: "#bad8db",
       accent: "#5fa8b4",
+      accentText: "#32646c",
       accent2: "#8aa9c4",
-      wash: "#c9e2e7",
+      wash: "#cadfe2",
     },
   },
   {
@@ -121,14 +133,15 @@ export const THEMES: Theme[] = [
     art: "saturate(0.52) sepia(0.22) brightness(1.03)",
     colors: {
       paper: "#f7f2e7",
-      paper2: "#f0e9d9",
-      paper3: "#e6dcc6",
+      paper2: "#f2e9d6",
+      paper3: "#eddfc1",
       ink: "#423a2e",
-      inkSoft: "#7d7263",
-      line: "#ddd0b6",
+      inkSoft: "#645b4f",
+      line: "#e4d5b3",
       accent: "#bb9a63",
+      accentText: "#725a32",
       accent2: "#a8886f",
-      wash: "#eadcc0",
+      wash: "#e3daca",
     },
   },
   {
@@ -140,14 +153,15 @@ export const THEMES: Theme[] = [
     art: "saturate(0.78) hue-rotate(14deg) brightness(1.01)",
     colors: {
       paper: "#f0ecf6",
-      paper2: "#e7e1f1",
-      paper3: "#dad2ea",
+      paper2: "#e4ddef",
+      paper3: "#d6cae8",
       ink: "#3b3550",
-      inkSoft: "#746c90",
-      line: "#cdc3e2",
+      inkSoft: "#59536f",
+      line: "#cabcde",
       accent: "#9188c6",
+      accentText: "#564a9b",
       accent2: "#b18fb9",
-      wash: "#ddd4ef",
+      wash: "#d1cee4",
     },
   },
   {
@@ -165,6 +179,7 @@ export const THEMES: Theme[] = [
       inkSoft: "#9a978f",
       line: "#3b3f4c",
       accent: "#7fb6bd",
+      accentText: "#7fb6bd",
       accent2: "#c4a1a8",
       wash: "#2a2f3b",
     },
@@ -188,6 +203,10 @@ export function themeVars(theme: Theme): Record<string, string> {
     "--ink-soft": c.inkSoft,
     "--line": c.line,
     "--accent": c.accent,
+    "--accent-text": c.accentText,
+    // The focus ring is the single most important pixel for a keyboard user,
+    // and the accent is the lowest-contrast colour in the palette. Ink.
+    "--focus": c.ink,
     "--accent-2": c.accent2,
     "--wash": c.wash,
     "--art-grade": theme.art,

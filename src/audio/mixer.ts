@@ -18,6 +18,15 @@ type Channel = {
   level: number;
   teardown: ReturnType<typeof setTimeout> | null;
   loading: boolean;
+  /**
+   * Bumped on every setLevel call.
+   *
+   * setLevel awaits twice, so two calls issued in the same task interleave on
+   * the microtask queue and can finish out of order. Without this, a quick
+   * off-after-on ends with the fader ramped up on a channel the user has
+   * already switched off, and the teardown then hard-stops it with a click.
+   */
+  seq: number;
 };
 
 const channels = new Map<string, Channel>();
@@ -31,7 +40,7 @@ function channel(id: string): Channel {
   const fader = ctx.createGain();
   fader.gain.value = 0;
   fader.connect(getMaster());
-  ch = { voice: null, fader, level: 0, teardown: null, loading: false };
+  ch = { voice: null, fader, level: 0, teardown: null, loading: false, seq: 0 };
   channels.set(id, ch);
   return ch;
 }
@@ -67,24 +76,32 @@ async function buildVoice(id: string, ch: Channel) {
 
 /** 0 switches the sound off. Everything in between is a fader position. */
 export async function setLevel(id: string, level: number) {
-  await resume();
   const ch = channel(id);
+  const seq = ++ch.seq;
   ch.level = level;
+
+  await resume();
+  if (ch.seq !== seq) return;
 
   if (level > 0) {
     if (ch.teardown) {
       clearTimeout(ch.teardown);
       ch.teardown = null;
     }
-    if (!ch.voice) await buildVoice(id, ch);
+    if (!ch.voice) {
+      await buildVoice(id, ch);
+      if (ch.seq !== seq) return;
+    }
     ramp(ch.fader.gain, faderToGain(level), FADE);
   } else {
     ramp(ch.fader.gain, 0, FADE);
     if (ch.teardown) clearTimeout(ch.teardown);
     ch.teardown = setTimeout(() => {
+      ch.teardown = null;
+      // It may have been switched back on while the fade was running.
+      if (ch.level > 0) return;
       ch.voice?.dispose();
       ch.voice = null;
-      ch.teardown = null;
     }, FADE * 1000 + 300);
   }
 }
@@ -93,12 +110,6 @@ export function stopAll() {
   for (const id of channels.keys()) void setLevel(id, 0);
 }
 
-/** Levels currently held by the audio layer, for state that outlives a reload. */
-export function currentLevels(): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const [id, ch] of channels) if (ch.level > 0) out[id] = ch.level;
-  return out;
-}
 
 /* ------------------------------------------------------------------ */
 /* music deck                                                          */
@@ -120,9 +131,13 @@ function ensureDeckFader(): GainNode {
 }
 
 /** level 0 stops the deck. Changing mode rebuilds it under a crossfade. */
+let musicSeq = 0;
+
 export async function setMusic(mode: DeckMode | null, level: number) {
-  await resume();
+  const seq = ++musicSeq;
   const fader = ensureDeckFader();
+  await resume();
+  if (musicSeq !== seq) return;
 
   if (!mode || level <= 0) {
     ramp(fader.gain, 0, FADE);
@@ -149,6 +164,7 @@ export async function setMusic(mode: DeckMode | null, level: number) {
     ramp(fader.gain, 0, 0.6);
     setTimeout(() => old.dispose(), 900);
     await new Promise((r) => setTimeout(r, 650));
+    if (musicSeq !== seq) return;
   }
 
   if (!deck) {

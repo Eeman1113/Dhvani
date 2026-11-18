@@ -33,12 +33,19 @@ function Box({ children }: { children: React.ReactNode }) {
 /* rain family                                                         */
 /* ------------------------------------------------------------------ */
 
-function Cloud({ y = 22, w = 1 }: { y?: number; w?: number }) {
+/**
+ * The seed is per card, not per shape.
+ *
+ * With a global seed every card in a family drew the byte-identical cloud, so
+ * Light Rain and Downpour were visibly the same drawing. Threading the sound
+ * id through means each one is drawn by the same hand on a different day.
+ */
+function Cloud({ id, y = 22, w = 1 }: { id: string; y?: number; w?: number }) {
   return (
     <>
-      <RoughCircle cx={24} cy={y} r={9 * w} seedKey="cl1" stroke={ink} strokeWidth={2} />
-      <RoughCircle cx={36} cy={y - 3} r={11 * w} seedKey="cl2" stroke={ink} strokeWidth={2} />
-      <RoughCircle cx={46} cy={y + 1} r={8 * w} seedKey="cl3" stroke={ink} strokeWidth={2} />
+      <RoughCircle cx={24} cy={y} r={9 * w} seedKey={`${id}-cl1`} stroke={ink} strokeWidth={2} />
+      <RoughCircle cx={36} cy={y - 3} r={11 * w} seedKey={`${id}-cl2`} stroke={ink} strokeWidth={2} />
+      <RoughCircle cx={46} cy={y + 1} r={8 * w} seedKey={`${id}-cl3`} stroke={ink} strokeWidth={2} />
     </>
   );
 }
@@ -70,31 +77,31 @@ function Drops({ n, seed, top = 34 }: { n: number; seed: string; top?: number })
   );
 }
 
-const Rain = ({ active }: Props) => {
+const Rain = ({ active, id }: Props) => {
   const ref = useMotion<SVGGElement>({ active, band: "air", lift: 3, scale: 0.05, phase: 0.2 });
   return (
     <Box>
       <g ref={ref}>
-        <Cloud />
-        <Drops n={5} seed="rain" />
+        <Cloud id={id} />
+        <Drops n={5} seed={`${id}-rain`} />
       </g>
     </Box>
   );
 };
 
-const Downpour = ({ active }: Props) => {
+const Downpour = ({ active, id }: Props) => {
   const ref = useMotion<SVGGElement>({ active, band: "air", lift: 4, scale: 0.06, phase: 1.1 });
   return (
     <Box>
       <g ref={ref}>
-        <Cloud y={20} w={1.1} />
-        <Drops n={11} seed="downpour" top={32} />
+        <Cloud id={id} y={20} w={1.1} />
+        <Drops n={11} seed={`${id}-downpour`} top={32} />
       </g>
     </Box>
   );
 };
 
-const Window = ({ active }: Props) => {
+const Window = ({ active, id }: Props) => {
   const ref = useMotion<SVGGElement>({ active, band: "mid", lift: 2, scale: 0.03, tilt: 0.8 });
   const beads = useMemo(() => {
     const r = seeded(hashString("beads"));
@@ -103,9 +110,9 @@ const Window = ({ active }: Props) => {
   return (
     <Box>
       <g ref={ref}>
-        <RoughLine points={[[12, 10], [52, 10], [52, 52], [12, 52], [12, 10]] as Pt[]} seedKey="win" stroke={ink} strokeWidth={2.2} />
-        <RoughLine points={[[32, 10], [32, 52]] as Pt[]} seedKey="winv" stroke={ink} strokeWidth={1.6} opacity={0.6} />
-        <RoughLine points={[[12, 31], [52, 31]] as Pt[]} seedKey="winh" stroke={ink} strokeWidth={1.6} opacity={0.6} />
+        <RoughLine points={[[12, 10], [52, 10], [52, 52], [12, 52], [12, 10]] as Pt[]} seedKey={`${id}-win`} stroke={ink} strokeWidth={2.2} />
+        <RoughLine points={[[32, 10], [32, 52]] as Pt[]} seedKey={`${id}-winv`} stroke={ink} strokeWidth={1.6} opacity={0.6} />
+        <RoughLine points={[[12, 31], [52, 31]] as Pt[]} seedKey={`${id}-winh`} stroke={ink} strokeWidth={1.6} opacity={0.6} />
         {beads.map((b, i) => (
           <circle key={i} cx={b.x} cy={b.y} r={b.s} fill={acc} opacity={0.65}>
             <animate attributeName="cy" values={`${b.y};${b.y + 6};${b.y}`} dur={`${2 + i * 0.4}s`} repeatCount="indefinite" />
@@ -116,12 +123,12 @@ const Window = ({ active }: Props) => {
   );
 };
 
-const Thunder = ({ active }: Props) => {
+const Thunder = ({ active, id }: Props) => {
   const ref = useMotion<SVGGElement>({ active, band: "bass", lift: 5, scale: 0.12, punch: 1.6, tilt: 3 });
   return (
     <Box>
       <g ref={ref}>
-        <Cloud y={20} />
+        <Cloud id={id} y={20} />
         <path
           d="M 34 30 L 26 44 L 33 44 L 28 56 L 42 40 L 34 40 L 40 30 Z"
           fill={acc}
@@ -140,7 +147,7 @@ const Thunder = ({ active }: Props) => {
 /* fire                                                                */
 /* ------------------------------------------------------------------ */
 
-const Fire = ({ active }: Props) => {
+const Fire = ({ active, id }: Props) => {
   const ref = useMotion<SVGGElement>({ active, band: "air", lift: 4, scale: 0.1, punch: 1.2 });
   return (
     <Box>
@@ -160,8 +167,8 @@ const Fire = ({ active }: Props) => {
             stroke="none"
           />
         </g>
-        <RoughLine points={[[16, 52], [48, 48]] as Pt[]} seedKey="log1" stroke={ink} strokeWidth={3} />
-        <RoughLine points={[[18, 48], [46, 53]] as Pt[]} seedKey="log2" stroke={ink} strokeWidth={3} />
+        <RoughLine points={[[16, 52], [48, 48]] as Pt[]} seedKey={`${id}-log1`} stroke={ink} strokeWidth={3} />
+        <RoughLine points={[[18, 48], [46, 53]] as Pt[]} seedKey={`${id}-log2`} stroke={ink} strokeWidth={3} />
       </g>
     </Box>
   );
@@ -261,15 +268,15 @@ const Wave = ({ active }: Props) => {
   );
 };
 
-const Stream = ({ active }: Props) => {
+const Stream = ({ active, id }: Props) => {
   const ref = useMotion<SVGGElement>({ active, band: "air", lift: 2, scale: 0.04 });
   return (
     <Box>
       <g ref={ref}>
         <path d="M 14 10 C 26 20, 18 28, 28 36 C 38 44, 30 50, 40 56" fill="none" stroke={acc} strokeWidth={3} strokeLinecap="round" />
         <path d="M 24 10 C 36 20, 28 28, 38 36 C 48 44, 40 50, 50 56" fill="none" stroke={ink} strokeWidth={2} strokeLinecap="round" opacity={0.7} />
-        <RoughCircle cx={18} cy={44} r={5} seedKey="rock1" stroke={ink} fill="var(--paper-3)" strokeWidth={2} />
-        <RoughCircle cx={48} cy={24} r={4} seedKey="rock2" stroke={ink} fill="var(--paper-3)" strokeWidth={2} />
+        <RoughCircle cx={18} cy={44} r={5} seedKey={`${id}-rock1`} stroke={ink} fill="var(--paper-3)" strokeWidth={2} />
+        <RoughCircle cx={48} cy={24} r={4} seedKey={`${id}-rock2`} stroke={ink} fill="var(--paper-3)" strokeWidth={2} />
       </g>
     </Box>
   );

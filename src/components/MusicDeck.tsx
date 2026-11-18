@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { RoughBorder } from "@/components/Rough";
+import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
 import { useMotion } from "@/lib/useMotion";
 import { musicNowPlaying, rerollMusic } from "@/audio/mixer";
@@ -95,13 +96,15 @@ export function MusicDeck() {
   // Once a second is plenty for a key and a tempo, and keeps this out of the
   // animation budget entirely.
   useEffect(() => {
-    if (!music) {
-      setNp(null);
-      return;
-    }
+    if (!music?.mode) return;
+    // Once a second is plenty for a key and a tempo, and keeps this out of
+    // the animation budget entirely.
     const id = setInterval(() => setNp(musicNowPlaying()), 1000);
-    return () => clearInterval(id);
-  }, [music]);
+    return () => {
+      clearInterval(id);
+      setNp(null);
+    };
+  }, [music?.mode]);
 
   const ref = useMotion<HTMLDivElement>({
     active: !!music,
@@ -133,7 +136,7 @@ export function MusicDeck() {
               <h2 className="hand text-xl leading-tight" style={{ color: "var(--ink)" }}>
                 Music
               </h2>
-              <p className="jp text-xs" style={{ color: "var(--accent)" }}>
+              <p className="jp text-xs" style={{ color: "var(--accent-text)" }}>
                 音楽
               </p>
             </div>
@@ -158,12 +161,20 @@ export function MusicDeck() {
                       strokeWidth={on ? 2.4 : 1.5}
                       opacity={on ? 1 : 0.4}
                     />
-                    <span className="relative z-10 flex items-baseline gap-1.5">
-                      <span className="hand text-base" style={{ color: "var(--ink)" }}>
-                        {m.name}
+                    <span className="relative z-10 block">
+                      <span className="flex items-baseline gap-1.5">
+                        <span className="hand text-base" style={{ color: "var(--ink)" }}>
+                          {m.name}
+                        </span>
+                        <span className="jp text-[0.62rem]" style={{ color: "var(--ink-soft)" }}>
+                          {m.jp}
+                        </span>
                       </span>
-                      <span className="jp text-[0.6rem]" style={{ color: "var(--ink-soft)" }}>
-                        {m.jp}
+                      <span
+                        className="mt-0.5 block max-w-[22ch] text-[0.7rem] leading-snug"
+                        style={{ color: "var(--ink-soft)" }}
+                      >
+                        {m.blurb}
                       </span>
                     </span>
                   </button>
@@ -193,7 +204,7 @@ export function MusicDeck() {
                 ? np
                   ? `${np.key}, ${np.bpm} bpm, on "${np.progression}". Bar ${np.bar}.`
                   : "warming up"
-                : MODES.map((m) => m.blurb).join(" / ")}
+                : "Written one bar at a time, about two seconds ahead of what you hear."}
             </p>
 
             {music && (
@@ -201,16 +212,14 @@ export function MusicDeck() {
                 <span className="hand text-sm" style={{ color: "var(--ink-soft)" }}>
                   level
                 </span>
-                <input
-                  type="range"
-                  min={0.02}
-                  max={1}
-                  step={0.01}
-                  value={music.level}
-                  onChange={(e) => setLevel(Number(e.target.value))}
-                  className="ink-slider max-w-xs"
-                  aria-label="Music volume"
-                />
+                <span className="w-full max-w-xs">
+                  <InkSlider
+                    value={music.level}
+                    onChange={(v) => setLevel(Math.max(0.02, v))}
+                    seed="music-level"
+                    label="Music volume"
+                  />
+                </span>
               </label>
             )}
           </div>

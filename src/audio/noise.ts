@@ -131,5 +131,20 @@ export function slowRandomLfo(
   src.buffer = buf;
   src.loop = true;
   src.playbackRate.value = CONTROL_RATE / MIN_BUFFER_RATE;
+  // Callers with the same (seconds, smoothingHz) share one cached waveform, so
+  // without a random phase they all read it from the same place at the same
+  // time. Fourteen speakers in a bar would then drift in pitch in perfect
+  // unison, which sounds like one detuning voice rather than a room.
+  src.loopStart = 0;
+  src.loopEnd = buf.duration;
+  startAtRandomPhase(src, buf);
   return src;
+}
+
+/** Starts a looping source somewhere in the middle of its buffer. */
+function startAtRandomPhase(src: AudioBufferSourceNode, buf: AudioBuffer) {
+  const offset = Math.random() * buf.duration;
+  const start = src.start.bind(src);
+  // The call sites all do a bare start(); rebinding keeps them unchanged.
+  src.start = ((when?: number) => start(when ?? 0, offset)) as typeof src.start;
 }

@@ -104,10 +104,10 @@ export function jitter(pts: Pt[], seed: number, amp = 2.2): Pt[] {
   // it does not vibrate.
   let ox = 0;
   let oy = 0;
-  return pts.map(() => [0, 0] as Pt).map((_, i) => {
+  return pts.map((pt) => {
     ox = ox * 0.55 + (rnd() * 2 - 1) * amp * 0.9;
     oy = oy * 0.55 + (rnd() * 2 - 1) * amp * 0.9;
-    return [pts[i][0] + ox, pts[i][1] + oy] as Pt;
+    return [pt[0] + ox, pt[1] + oy] as Pt;
   });
 }
 

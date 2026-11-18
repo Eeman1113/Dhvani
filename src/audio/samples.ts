@@ -36,6 +36,12 @@ export async function loadSample(sound: Sound & { kind: "sample" }): Promise<Voi
   // crossfaded at the join. Either half alone would click; together the seam
   // disappears completely.
   const period = end - start - XF;
+  // A file that decodes to almost nothing would give period 0, and the
+  // onended recursion would then spawn a source every few milliseconds for
+  // as long as the page is open. Refuse it instead.
+  if (!(period > 0.2)) {
+    throw new Error(`sample ${sound.src}: too short to loop (${buf.duration.toFixed(2)}s)`);
+  }
   const nodes: AudioBufferSourceNode[] = [];
   let stopped = false;
 
@@ -57,7 +63,7 @@ export async function loadSample(sound: Sound & { kind: "sample" }): Promise<Voi
       const i = nodes.indexOf(src);
       if (i >= 0) nodes.splice(i, 1);
       // Each pass schedules the pass after next, keeping exactly two alive.
-      schedule(at + period * 2, index + 2);
+      schedule(Math.max(at + period * 2, ctx.currentTime + 0.05), index + 2);
     };
   };
 

@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Doodle } from "@/components/doodles";
 import { RoughBorder } from "@/components/Rough";
+import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
 import { useMotion } from "@/lib/useMotion";
 import type { Sound } from "@/audio/catalogue";
@@ -12,7 +13,6 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
   const setSound = useDhvani((s) => s.setSound);
   const active = level > 0;
   const [showNote, setShowNote] = useState(false);
-  const sliderRef = useRef<HTMLInputElement>(null);
 
   // The whole card has weight. Active cards ride the mix; idle ones just
   // breathe, with a phase offset so a row never moves in lockstep.
@@ -55,7 +55,7 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
           >
             <Doodle name={sound.doodle} active={active} id={sound.id} />
           </span>
-          <span className="flex items-baseline gap-1.5 leading-none">
+          <span className="flex flex-wrap items-baseline justify-center gap-x-1.5 leading-tight">
             <span className="hand text-[1.05rem]" style={{ color: "var(--ink)" }}>
               {sound.name}
             </span>
@@ -65,21 +65,21 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
           </span>
         </button>
 
-        <div
-          className="relative z-10 w-full overflow-hidden transition-all duration-500"
-          style={{ height: active ? 24 : 0, opacity: active ? 1 : 0 }}
-        >
-          <input
-            ref={sliderRef}
-            type="range"
-            min={0.02}
-            max={1}
-            step={0.01}
-            value={level || 0.02}
-            onChange={(e) => setSound(sound.id, Number(e.target.value))}
-            className="ink-slider"
-            aria-label={`${sound.name} volume`}
-            tabIndex={active ? 0 : -1}
+        {/*
+          Always present, never hidden.
+          A control that only exists once the thing is already on means the
+          first fader a new visitor sees is no fader at all, and hiding a live
+          input is what put eighty of them in the accessibility tree.
+          Off cards keep a hairline of the same drawn line.
+        */}
+        <div className="relative z-10 mt-1 w-full px-1">
+          <InkSlider
+            value={active ? level : 0}
+            dim={!active}
+            seed={`slider-${sound.id}`}
+            label={`${sound.name} volume`}
+            valueText={active ? `${Math.round(level * 100)} percent` : "off"}
+            onChange={(v) => setSound(sound.id, v <= 0.02 ? 0 : v)}
           />
         </div>
 
@@ -98,17 +98,19 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
         <button
           type="button"
           onClick={() => setShowNote((v) => !v)}
-          className="absolute right-2 top-2 z-10 h-5 w-5 rounded-full text-[0.7rem] leading-none transition-opacity"
+          className="absolute right-1 top-1 z-10 flex h-6 w-6 items-center justify-center rounded-full text-[0.72rem] leading-none transition-opacity"
           style={{ color: "var(--ink-soft)", opacity: showNote ? 1 : 0.35 }}
           aria-label={`How ${sound.name} is made`}
           aria-expanded={showNote}
+          aria-controls={`note-${sound.id}`}
         >
           ?
         </button>
 
         {showNote && (
           <p
-            className="relative z-10 px-1 pt-1 text-center text-[0.68rem] leading-snug"
+            id={`note-${sound.id}`}
+            className="relative z-10 px-1 pt-1 text-center text-[0.7rem] leading-snug"
             style={{ color: "var(--ink-soft)" }}
           >
             {sound.note}

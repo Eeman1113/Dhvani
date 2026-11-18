@@ -5,9 +5,28 @@ import { DEFAULT_THEME, type ThemeId } from "./themes";
 import { setLevel, setMusic, stopAll } from "@/audio/mixer";
 import { setMasterVolume } from "@/audio/engine";
 import type { DeckMode } from "@/audio/lofi/engine";
-import { PRESETS, type Preset } from "@/audio/catalogue";
+import { PRESETS, SOUND_BY_ID, type Preset } from "@/audio/catalogue";
 
 const KEY = "dhvani.state.v1";
+
+/**
+ * Says what just happened, for anyone who cannot see it happen.
+ *
+ * Toggling a sound changes a card's colour and starts a fade; neither is
+ * perceivable without sight, so nothing at all was being reported.
+ */
+export function announce(message: string) {
+  if (typeof document === "undefined") return;
+  const el = document.getElementById("dhvani-live");
+  if (el) el.textContent = message;
+}
+
+function levelMessage(id: string, level: number, levels: Record<string, number>) {
+  const name = SOUND_BY_ID[id]?.name ?? id;
+  const n = Object.keys(levels).length;
+  if (level <= 0) return `${name} off. ${n} playing.`;
+  return `${name} on at ${Math.round(level * 100)} percent. ${n} playing.`;
+}
 
 type Persisted = {
   theme: ThemeId;
@@ -25,7 +44,6 @@ type State = Persisted & {
   setTheme(t: ThemeId): void;
   setMaster(v: number): void;
   setSound(id: string, level: number): void;
-  toggleSound(id: string): void;
   setMusicMode(mode: DeckMode | null): void;
   setMusicLevel(v: number): void;
   applyPreset(p: Preset): void;
@@ -42,16 +60,35 @@ function load(): Partial<Persisted> {
   }
 }
 
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+let pending: Persisted | null = null;
+
+/**
+ * Trailing-debounced persistence.
+ *
+ * A slider drag fires sixty to a hundred change events a second, and each one
+ * used to stringify and write the whole state synchronously. It is cheap at
+ * this payload size, but it is on the interaction path and it has no business
+ * being there.
+ */
 function save(s: Persisted) {
   if (typeof window === "undefined") return;
-  try {
-    localStorage.setItem(
-      KEY,
-      JSON.stringify({ theme: s.theme, master: s.master, levels: s.levels, music: s.music }),
-    );
-  } catch {
-    /* private mode, quota, whatever. Not worth breaking playback over. */
-  }
+  pending = s;
+  if (saveTimer) return;
+  saveTimer = setTimeout(() => {
+    saveTimer = null;
+    const v = pending;
+    pending = null;
+    if (!v) return;
+    try {
+      localStorage.setItem(
+        KEY,
+        JSON.stringify({ theme: v.theme, master: v.master, levels: v.levels, music: v.music }),
+      );
+    } catch {
+      /* private mode, quota, whatever. Not worth breaking playback over. */
+    }
+  }, 400);
 }
 
 export const useDhvani = create<State>((set, get) => ({
@@ -87,15 +124,14 @@ export const useDhvani = create<State>((set, get) => ({
     const levels = { ...get().levels };
     if (level <= 0) delete levels[id];
     else levels[id] = level;
-    set({ levels });
+    // wake() replays every stored level, so it has to run against the state
+    // BEFORE this change; otherwise the sound just clicked is started twice,
+    // once by wake and once below, racing through the same await.
     get().wake();
+    set({ levels });
     void setLevel(id, level);
     save({ ...get(), levels });
-  },
-
-  toggleSound(id) {
-    const cur = get().levels[id] ?? 0;
-    get().setSound(id, cur > 0 ? 0 : 0.5);
+    announce(levelMessage(id, level, levels));
   },
 
   setMusicMode(mode) {
@@ -124,6 +160,7 @@ export const useDhvani = create<State>((set, get) => ({
 
   applyPreset(p) {
     get().wake();
+    announce(`${p.name} preset applied.`);
     // Everything not in the preset fades out, so presets replace rather than pile up.
     for (const id of Object.keys(get().levels)) {
       if (!(id in p.mix)) void setLevel(id, 0);
@@ -137,6 +174,7 @@ export const useDhvani = create<State>((set, get) => ({
   },
 
   clear() {
+    announce("All sounds stopped.");
     stopAll();
     void setMusic(null, 0);
     set({ levels: {}, music: null });

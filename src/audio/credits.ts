@@ -20,7 +20,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/drewhalasz/sounds/433002/",
     file: "/audio/airplane-cabin.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "airport-terminal",
@@ -31,7 +31,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/loganzsound/sounds/868379/",
     file: "/audio/airport-terminal.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "birds-dawn",
@@ -42,7 +42,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/SamsterBirdies/sounds/745273/",
     file: "/audio/birds-dawn.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "birds-dawn-2",
@@ -53,7 +53,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/squashy555/sounds/573080/",
     file: "/audio/birds-dawn-2.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "blizzard",
@@ -86,7 +86,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/lastraindrop/sounds/716384/",
     file: "/audio/city-street.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "clock-ticking",
@@ -119,7 +119,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/lydgutten/sounds/774240/",
     file: "/audio/crowd-cafe.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "fireplace",
@@ -163,7 +163,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/heyheymaimai/sounds/493066/",
     file: "/audio/frogs-night.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "harbour-seagulls",
@@ -185,11 +185,11 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/xkeril/sounds/620683/",
     file: "/audio/library.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "market-bazaar",
-    title: "Evening Bazaar Ambience at Souq Al Bashorah, Ramallah – Palestine",
+    title: "Evening Bazaar Ambience at Souq Al Bashorah, Ramallah, Palestine",
     author: "sounds_from_palestine",
     license: "CC0 1.0",
     licenseUrl: "https://creativecommons.org/publicdomain/zero/1.0/",
@@ -240,7 +240,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/felix.blume/sounds/422097/",
     file: "/audio/restaurant-chatter.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "subway-station",
@@ -284,7 +284,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/pblzr/sounds/785398/",
     file: "/audio/train-interior.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "washing-machine",
@@ -295,7 +295,7 @@ export const CREDITS: Credit[] = [
     sourceUrl: "https://freesound.org/people/oliwoli/sounds/548461/",
     file: "/audio/washing-machine.mp3",
     durationSeconds: 80.0,
-    modified: "trimmed to 80s (from 10s) and re-encoded to 128k stereo mp3",
+    modified: "trimmed to 80s and re-encoded to 128k stereo mp3",
   },
   {
     id: "wind-chimes",

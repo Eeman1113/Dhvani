@@ -42,6 +42,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${zen.variable} ${caveat.variable} ${kalam.variable} antialiased`}>
         <ThemeProvider />
         {children}
+        {/* Toggling a sound changes a colour and starts a fade. Neither is
+            perceivable without sight, so say what happened. */}
+        <div id="dhvani-live" role="status" aria-live="polite" className="sr-only" />
       </body>
     </html>
   );

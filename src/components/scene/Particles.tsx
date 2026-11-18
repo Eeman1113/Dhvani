@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { subscribeFrame, type Levels } from "@/audio/engine";
-import { signals, refreshSignals, stepSignals } from "@/lib/signals";
+import { signals } from "@/lib/signals";
 import { asset } from "@/lib/asset";
 
 /**
@@ -102,7 +102,6 @@ export function Particles() {
     };
     readTheme();
 
-    let refreshIn = 0;
     const rnd = (a: number, b: number) => a + Math.random() * (b - a);
 
     const spawn = (kind: Kind) => {
@@ -169,19 +168,14 @@ export function Particles() {
     };
 
     const step = (levels: Levels, dt: number) => {
+      // Only the drawing is gated on reduced motion. The signals themselves
+      // are driven by the atmosphere, so colour and light still respond.
       if (reduced) return;
-      refreshIn -= dt;
-      if (refreshIn <= 0) {
-        refreshSignals();
-        refreshIn = 0.4;
-      }
       readThemeIn -= dt;
       if (readThemeIn <= 0) {
         readTheme();
         readThemeIn = 1.0;
       }
-      stepSignals(dt);
-
       ctx.clearRect(0, 0, w, h);
       if (w === 0 || h === 0) return;
 

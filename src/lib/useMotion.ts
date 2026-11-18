@@ -36,7 +36,11 @@ export type MotionOpts = {
 export function useMotion<T extends SVGElement | HTMLElement>(opts: MotionOpts = {}) {
   const ref = useRef<T>(null);
   const o = useRef(opts);
-  o.current = opts;
+  // Written after commit, not during render. A render that React throws away
+  // must not leave its props behind in a ref the frame loop is reading.
+  useEffect(() => {
+    o.current = opts;
+  });
 
   useEffect(() => {
     const el = ref.current;
@@ -70,40 +74,11 @@ export function useMotion<T extends SVGElement | HTMLElement>(opts: MotionOpts =
       const scale = 1 + (c.scale ?? 0.08) * value + sway2 * 0.004;
       const tilt = (c.tilt ?? 2) * value * Math.sin(t * 1.7 + phase) + sway2 * 0.7;
 
-      el.style.transform = `translate3d(0, ${-lift.toFixed(2)}px, 0) scale(${scale.toFixed(4)}) rotate(${tilt.toFixed(2)}deg)`;
+      el.style.transform = `translate3d(0, ${(-lift).toFixed(2)}px, 0) scale(${scale.toFixed(4)}) rotate(${tilt.toFixed(2)}deg)`;
     };
 
     return subscribeFrame(step);
   }, []);
-
-  return ref;
-}
-
-/** Writes a CSS custom property instead of a transform, for driving keyframe speeds. */
-export function useLevelVar<T extends HTMLElement | SVGElement>(
-  prop: string,
-  map: (l: Levels) => string,
-  active = true,
-) {
-  const ref = useRef<T>(null);
-  const fn = useRef(map);
-  fn.current = map;
-  const on = useRef(active);
-  on.current = active;
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    let last = "";
-    return subscribeFrame((l) => {
-      if (!on.current) return;
-      const v = fn.current(l);
-      if (v !== last) {
-        el.style.setProperty(prop, v);
-        last = v;
-      }
-    });
-  }, [prop]);
 
   return ref;
 }

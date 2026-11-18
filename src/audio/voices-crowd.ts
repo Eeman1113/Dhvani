@@ -17,7 +17,7 @@
  * reads to the ear as talking even when no word is recoverable.
  */
 
-import { getContext, rand, randInt, pick } from "./engine";
+import { rand, randInt, pick } from "./engine";
 import { noiseSource, randomOffset, slowRandomLfo } from "./noise";
 import { subscribeClock, poisson, type PoissonState } from "./clock";
 import { rig, filt, gain, transient, partial, type Voice } from "./voices";
@@ -201,7 +201,15 @@ function crowd(o: CrowdOpts): Voice {
     const fb = gain(ctx, 0.28);
     const send = gain(ctx, g);
     room.connect(send).connect(d).connect(fb).connect(d);
-    d.connect(filt(ctx, "lowpass", 2200, 0.7)).connect(out);
+    const damp = filt(ctx, "lowpass", 2200, 0.7);
+    d.connect(damp).connect(out);
+    // Same reasoning as the cave: break the cycle by hand on teardown.
+    r.cleanup(() => {
+      d.disconnect();
+      fb.disconnect();
+      send.disconnect();
+      damp.disconnect();
+    });
   }
 
   const stops: (() => void)[] = [];
