@@ -772,6 +772,59 @@ const Traffic = doodle(
   { band: "bass", scale: 0.04 },
 );
 
+
+/* ------------------------------------------------------------------ */
+/* the music deck                                                      */
+/* ------------------------------------------------------------------ */
+
+const Cassette = doodle(
+  () => (
+    <>
+      <rect x={6} y={16} width={52} height={34} rx={4} fill={paper3} stroke={ink} strokeWidth={2.2} />
+      <rect x={12} y={22} width={40} height={16} rx={2} fill={paper2} stroke={ink} strokeWidth={1.6} />
+      {[22, 42].map((cx, i) => (
+        <g key={cx} className="anim-spin" style={css({ "--d": `${2.4 + i * 0.3}s`, transformOrigin: `${cx}px 30px` })}>
+          <circle cx={cx} cy={30} r={6} fill={acc} stroke={ink} strokeWidth={1.8} />
+          <circle cx={cx} cy={30} r={2} fill={paper2} stroke={ink} strokeWidth={1.2} />
+          <path d={`M ${cx} 24 L ${cx} 26 M ${cx + 6} 30 L ${cx + 4} 30 M ${cx} 36 L ${cx} 34 M ${cx - 6} 30 L ${cx - 4} 30`}
+            stroke={ink} strokeWidth={1.3} strokeLinecap="round" />
+        </g>
+      ))}
+      <path d={`M 28 30 L 36 30`} stroke={ink} strokeWidth={1.6} opacity={0.5} />
+      <path d="M 14 44 L 50 44" stroke={ink} strokeWidth={1.3} opacity={0.35} />
+      <circle cx={16} cy={47} r={1.4} fill={ink} opacity={0.4} />
+      <circle cx={48} cy={47} r={1.4} fill={ink} opacity={0.4} />
+    </>
+  ),
+  { band: "bass", punch: 1.4, scale: 0.06 },
+);
+
+const Nocturne = doodle(
+  () => (
+    <>
+      {/* a crescent, and a line of song under it */}
+      <path d="M 44 8 C 34 10, 28 19, 30 29 C 32 39, 42 45, 52 42 C 44 40, 38 33, 37 25 C 36 17, 39 11, 44 8 Z"
+        fill={acc} stroke={ink} strokeWidth={2} strokeLinejoin="round" />
+      {[0, 1, 2].map((i) => (
+        <path key={i} d={`M 6 ${44 + i * 5} C 24 ${42 + i * 5}, 42 ${46 + i * 5}, 58 ${43 + i * 5}`}
+          fill="none" stroke={ink} strokeWidth={0.9} opacity={0.3} />
+      ))}
+      {[14, 26, 38].map((x, i) => (
+        <g key={x}>
+          <ellipse cx={x} cy={48 - i * 2} rx={4} ry={3} fill={ink} transform={`rotate(-18 ${x} ${48 - i * 2})`}>
+            <animate attributeName="cy" values={`${48 - i * 2};${44 - i * 2};${48 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
+          </ellipse>
+          <line x1={x + 3.6} y1={48 - i * 2} x2={x + 3.6} y2={36 - i * 2} stroke={ink} strokeWidth={1.4} strokeLinecap="round">
+            <animate attributeName="y1" values={`${48 - i * 2};${44 - i * 2};${48 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
+            <animate attributeName="y2" values={`${36 - i * 2};${32 - i * 2};${36 - i * 2}`} dur={`${2.6 + i * 0.7}s`} repeatCount="indefinite" />
+          </line>
+        </g>
+      ))}
+    </>
+  ),
+  { band: "mid", punch: 1.2, scale: 0.06, tilt: 1.6 },
+);
+
 /* ------------------------------------------------------------------ */
 /* noise colours                                                       */
 /* ------------------------------------------------------------------ */
@@ -843,6 +896,8 @@ export const MORE_DOODLES: Record<string, React.FC<Props>> = {
   heart: Heart,
   train: Train,
   traffic: Traffic,
+  cassette: Cassette,
+  nocturne: Nocturne,
   green: Green,
   blue: Blue,
 };

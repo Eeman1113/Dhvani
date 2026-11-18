@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Doodle } from "@/components/doodles";
 import { RoughBorder } from "@/components/Rough";
 import { InkSlider } from "@/components/InkSlider";
 import { useDhvani } from "@/lib/store";
@@ -8,84 +9,40 @@ import { useMotion } from "@/lib/useMotion";
 import { musicNowPlaying, rerollMusic } from "@/audio/mixer";
 import type { DeckMode } from "@/audio/lofi/engine";
 
-const MODES: { id: DeckMode; name: string; jp: string; blurb: string }[] = [
+/**
+ * The music deck.
+ *
+ * Two cards with exactly the grammar of a sound card: a doodle, a name, a
+ * gloss, a fader. It used to be one wide panel with its own heading inside a
+ * border, which made it a different species from everything around it and
+ * left it as the largest and emptiest thing on the page. Music is not a
+ * separate apparatus here, it is one more thing you turn on.
+ */
+
+const MODES: {
+  id: DeckMode;
+  name: string;
+  jp: string;
+  doodle: string;
+  blurb: string;
+}[] = [
   {
     id: "lofi",
     name: "Lofi",
     jp: "低忠実",
-    blurb: "a kit, a rhodes and a worn tape, written one bar at a time",
+    doodle: "cassette",
+    blurb:
+      "A kit behind the beat, a Rhodes, and a tape that has been round the heads too many times.",
   },
   {
     id: "classical",
     name: "Nocturne",
     jp: "夜想",
-    blurb: "strings, harp and a voice, moving through real cadences",
+    doodle: "nocturne",
+    blurb:
+      "Strings, harp and a synthesised voice, moving through lament basses and real cadences.",
   },
 ];
-
-/** A small staff of ink that moves with what is being played. */
-function Staff({ active }: { active: boolean }) {
-  const ref = useMotion<SVGGElement>({ active, band: "mid", lift: 3, scale: 0.05, punch: 1.2 });
-  return (
-    <svg viewBox="0 0 120 56" className="h-14 w-28 overflow-visible" aria-hidden>
-      <g ref={ref}>
-        {[0, 1, 2, 3].map((i) => (
-          <path
-            key={i}
-            d={`M 6 ${14 + i * 9} C 40 ${12 + i * 9}, 80 ${16 + i * 9}, 114 ${13 + i * 9}`}
-            stroke="var(--ink)"
-            strokeWidth={1}
-            fill="none"
-            opacity={0.3}
-          />
-        ))}
-        {[18, 44, 66, 92].map((x, i) => (
-          <g key={x}>
-            <ellipse
-              cx={x}
-              cy={30 - i * 4}
-              rx={5.4}
-              ry={4}
-              fill="var(--accent)"
-              stroke="var(--ink)"
-              strokeWidth={1.4}
-              transform={`rotate(-20 ${x} ${30 - i * 4})`}
-            >
-              <animate
-                attributeName="cy"
-                values={`${30 - i * 4};${24 - i * 4};${30 - i * 4}`}
-                dur={`${2 + i * 0.6}s`}
-                repeatCount="indefinite"
-              />
-            </ellipse>
-            <line
-              x1={x + 5}
-              y1={30 - i * 4}
-              x2={x + 5}
-              y2={12 - i * 4}
-              stroke="var(--ink)"
-              strokeWidth={1.6}
-              strokeLinecap="round"
-            >
-              <animate
-                attributeName="y1"
-                values={`${30 - i * 4};${24 - i * 4};${30 - i * 4}`}
-                dur={`${2 + i * 0.6}s`}
-                repeatCount="indefinite"
-              />
-              <animate
-                attributeName="y2"
-                values={`${12 - i * 4};${6 - i * 4};${12 - i * 4}`}
-                dur={`${2 + i * 0.6}s`}
-                repeatCount="indefinite"
-              />
-            </line>
-          </g>
-        ))}
-      </g>
-    </svg>
-  );
-}
 
 export function MusicDeck() {
   const music = useDhvani((s) => s.music);
@@ -93,8 +50,6 @@ export function MusicDeck() {
   const setLevel = useDhvani((s) => s.setMusicLevel);
   const [np, setNp] = useState<ReturnType<typeof musicNowPlaying>>(null);
 
-  // Once a second is plenty for a key and a tempo, and keeps this out of the
-  // animation budget entirely.
   useEffect(() => {
     if (!music?.mode) return;
     // Once a second is plenty for a key and a tempo, and keeps this out of
@@ -106,124 +61,141 @@ export function MusicDeck() {
     };
   }, [music?.mode]);
 
+  return (
+    <section aria-labelledby="music-heading">
+      <header className="mb-3 flex flex-wrap items-baseline gap-x-2.5 gap-y-1 pl-1">
+        <h2 id="music-heading" className="hand text-xl leading-none" style={{ color: "var(--ink)" }}>
+          Music
+        </h2>
+        <span className="jp text-sm leading-none" style={{ color: "var(--accent-text)" }}>
+          音楽
+        </span>
+        <span className="basis-full text-[0.78rem] leading-snug sm:basis-auto" style={{ color: "var(--ink-soft)" }}>
+          written one bar at a time, about two seconds ahead of what you hear
+        </span>
+      </header>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        {MODES.map((m, i) => (
+          <ModeCard
+            key={m.id}
+            mode={m}
+            index={i}
+            active={music?.mode === m.id}
+            level={music?.mode === m.id ? music.level : 0}
+            nowPlaying={music?.mode === m.id ? np : null}
+            onToggle={() => setMode(music?.mode === m.id ? null : m.id)}
+            onLevel={(v) => setLevel(Math.max(0.02, v))}
+            onReroll={() => {
+              rerollMusic();
+              setNp(musicNowPlaying());
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ModeCard({
+  mode,
+  index,
+  active,
+  level,
+  nowPlaying,
+  onToggle,
+  onLevel,
+  onReroll,
+}: {
+  mode: (typeof MODES)[number];
+  index: number;
+  active: boolean;
+  level: number;
+  nowPlaying: ReturnType<typeof musicNowPlaying>;
+  onToggle: () => void;
+  onLevel: (v: number) => void;
+  onReroll: () => void;
+}) {
   const ref = useMotion<HTMLDivElement>({
-    active: !!music,
-    band: "bass",
-    lift: 4,
-    scale: 0.016,
-    tilt: 0.4,
-    punch: 0.8,
+    active,
+    band: mode.id === "lofi" ? "bass" : "mid",
+    lift: active ? 5 : 0,
+    scale: active ? 0.02 : 0,
+    tilt: active ? 0.5 : 0,
+    punch: 0.7,
+    idle: active ? 1 : 0.55,
+    phase: index * 1.4,
   });
 
   return (
     <div ref={ref} className="relative will-change-transform">
       <div
-        className="relative rounded-[22px] px-5 py-5 transition-colors duration-500 sm:px-7"
-        style={{ background: music ? "var(--wash)" : "var(--paper-2)" }}
+        className="relative flex gap-4 rounded-[18px] px-4 py-4 transition-colors duration-500"
+        style={{ background: active ? "var(--wash)" : "var(--paper-2)" }}
       >
         <RoughBorder
-          seedKey="music-deck"
-          radius={22}
-          stroke={music ? "var(--accent)" : "var(--ink)"}
-          strokeWidth={music ? 2.6 : 1.8}
-          opacity={music ? 1 : 0.4}
+          seedKey={`mode-${mode.id}`}
+          radius={18}
+          stroke={active ? "var(--accent)" : "var(--ink)"}
+          strokeWidth={active ? 2.6 : 1.8}
+          opacity={active ? 1 : 0.42}
         />
 
-        <div className="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-          <div className="flex items-center gap-3">
-            <Staff active={!!music} />
-            <div>
-              <h2 className="hand text-xl leading-tight" style={{ color: "var(--ink)" }}>
-                Music
-              </h2>
-              <p className="jp text-xs" style={{ color: "var(--accent-text)" }}>
-                音楽
-              </p>
-            </div>
-          </div>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-pressed={active}
+          className="relative z-10 flex flex-1 items-start gap-3 text-left"
+        >
+          <span className="h-14 w-14 shrink-0 transition-opacity duration-500" style={{ opacity: active ? 1 : 0.42 }}>
+            <Doodle name={mode.doodle} active={active} id={mode.id} />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="flex items-baseline gap-1.5">
+              <span className="hand text-lg leading-none" style={{ color: "var(--ink)" }}>
+                {mode.name}
+              </span>
+              <span className="jp text-[0.62rem] leading-none" style={{ color: "var(--ink-soft)" }}>
+                {mode.jp}
+              </span>
+            </span>
+            <span className="mt-1 block text-[0.74rem] leading-snug" style={{ color: "var(--ink-soft)" }}>
+              {active && nowPlaying
+                ? `${nowPlaying.key}, ${nowPlaying.bpm} bpm, on "${nowPlaying.progression}". Bar ${nowPlaying.bar}.`
+                : active
+                  ? "warming up"
+                  : mode.blurb}
+            </span>
+          </span>
+        </button>
+      </div>
 
-          <div className="flex flex-1 flex-col gap-3">
-            <div className="flex flex-wrap gap-2">
-              {MODES.map((m) => {
-                const on = music?.mode === m.id;
-                return (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => setMode(on ? null : m.id)}
-                    className="relative px-4 py-2 text-left transition-transform duration-200 active:scale-95"
-                    aria-pressed={on}
-                  >
-                    <RoughBorder
-                      seedKey={`mode-${m.id}`}
-                      radius={13}
-                      stroke={on ? "var(--accent)" : "var(--ink)"}
-                      strokeWidth={on ? 2.4 : 1.5}
-                      opacity={on ? 1 : 0.4}
-                    />
-                    <span className="relative z-10 block">
-                      <span className="flex items-baseline gap-1.5">
-                        <span className="hand text-base" style={{ color: "var(--ink)" }}>
-                          {m.name}
-                        </span>
-                        <span className="jp text-[0.62rem]" style={{ color: "var(--ink-soft)" }}>
-                          {m.jp}
-                        </span>
-                      </span>
-                      <span
-                        className="mt-0.5 block max-w-[22ch] text-[0.7rem] leading-snug"
-                        style={{ color: "var(--ink-soft)" }}
-                      >
-                        {m.blurb}
-                      </span>
-                    </span>
-                  </button>
-                );
-              })}
-
-              {music && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    rerollMusic();
-                    setNp(musicNowPlaying());
-                  }}
-                  className="relative px-4 py-2 transition-transform duration-200 active:scale-95"
-                  title="New key, new progression, no gap"
-                >
-                  <RoughBorder seedKey="reroll" radius={13} stroke="var(--ink)" strokeWidth={1.5} opacity={0.4} />
-                  <span className="hand relative z-10 text-base" style={{ color: "var(--ink-soft)" }}>
-                    again, differently
-                  </span>
-                </button>
-              )}
-            </div>
-
-            <p className="text-[0.76rem] leading-snug" style={{ color: "var(--ink-soft)" }}>
-              {music
-                ? np
-                  ? `${np.key}, ${np.bpm} bpm, on "${np.progression}". Bar ${np.bar}.`
-                  : "warming up"
-                : "Written one bar at a time, about two seconds ahead of what you hear."}
-            </p>
-
-            {music && (
-              <label className="flex items-center gap-3">
-                <span className="hand text-sm" style={{ color: "var(--ink-soft)" }}>
-                  level
-                </span>
-                <span className="w-full max-w-xs">
-                  <InkSlider
-                    value={music.level}
-                    onChange={(v) => setLevel(Math.max(0.02, v))}
-                    seed="music-level"
-                    label="Music volume"
-                  />
-                </span>
-              </label>
-            )}
-          </div>
-        </div>
+      <div
+        className="relative z-10 mt-2 flex items-center gap-3 px-1 transition-opacity duration-500"
+        style={{ opacity: active ? 1 : 0, pointerEvents: active ? "auto" : "none" }}
+        aria-hidden={!active}
+      >
+        <span className="flex-1">
+          <InkSlider
+            value={level}
+            dim={!active}
+            seed={`music-${mode.id}`}
+            label={`${mode.name} volume`}
+            onChange={onLevel}
+            disabled={!active}
+          />
+        </span>
+        <button
+          type="button"
+          onClick={onReroll}
+          disabled={!active}
+          tabIndex={active ? 0 : -1}
+          className="hand shrink-0 text-[0.8rem] underline-offset-4 hover:underline"
+          style={{ color: "var(--accent-text)" }}
+          title="New key, new progression, no gap"
+        >
+          again, differently
+        </button>
       </div>
     </div>
   );
