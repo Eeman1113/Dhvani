@@ -8,8 +8,7 @@
 recordings, and a generative music deck that writes lofi and classical nocturnes
 one bar at a time. Put it on and leave it on.
 
-Made by **Eeman Majumder**<br>
-Logo by **[Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/)**
+Made by **Eeman Majumder**
 
 </div>
 
