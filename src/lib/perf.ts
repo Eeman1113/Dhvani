@@ -122,8 +122,8 @@ export function startWatching() {
   /*
    * An override in the URL, which beats everything.
    *
-   *   ?draw=light  force the light version
-   *   ?draw=full   force the full one
+   *   ?draw=lite   force lite mode (?draw=light also accepted)
+   *   ?draw=full   force the full drawing
    *   ?draw=ask    show the offer now
    *
    * Worth having so the light version can be linked to directly, and so the

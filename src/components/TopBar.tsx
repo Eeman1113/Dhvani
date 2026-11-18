@@ -166,7 +166,13 @@ function Swatches({ size = 28 }: { size?: number }) {
   );
 }
 
-/** Switch between the full drawing and the light one, at any time. */
+/**
+ * Switch between the full drawing and lite, at any time.
+ *
+ * Called "lite" and never "light": this app has six papers, one of which is
+ * a dark one, so "the light version" reads as a theme rather than as a
+ * rendering tier. The distinction has to survive being skim-read.
+ */
 function TierToggle({ block = false }: { block?: boolean }) {
   const tier = useTier();
   const lite = tier === "lite";
@@ -179,11 +185,11 @@ function TierToggle({ block = false }: { block?: boolean }) {
       style={{ color: lite ? "var(--accent-text)" : "var(--ink-soft)" }}
       title={
         lite
-          ? "Currently drawing the light version. Every sound is the same either way."
+          ? "Lite mode is on. Every sound and both music modes are exactly the same either way."
           : "Draw less: no moving background, no particles, no redrawn lines. All sounds unchanged."
       }
     >
-      {lite ? "light drawing is on" : "draw less"}
+      {lite ? "lite mode is on" : "lite mode"}
     </button>
   );
 }
@@ -276,12 +282,12 @@ function MobileSheet({ onClose }: { onClose: () => void }) {
 
       <div className="relative z-10">
         <p className="hand mb-1 text-sm" style={{ color: "var(--ink-soft)" }}>
-          drawing
+          lite mode
         </p>
         <TierToggle block />
         <p className="mt-0.5 text-[0.72rem] leading-snug" style={{ color: "var(--ink-soft)" }}>
-          The light version keeps every sound and both music modes. It just
-          draws less, which helps an older machine.
+          Keeps every sound and both music modes. It just draws less, which
+          helps an older machine. This is not the paper colour.
         </p>
       </div>
 

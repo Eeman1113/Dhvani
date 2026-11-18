@@ -47,18 +47,18 @@ scheduler. There is no hour two, because there is nothing to come back around.
   the sheet darkens and fireflies come out.
 - **Six papers** built from traditional Japanese colours, a sleep timer, and a
   mix that survives a reload.
-- **A light drawing mode** for older machines. Dhvani draws a lot: around a
+- **Lite mode** for older machines (nothing to do with the paper colour). Dhvani draws a lot: around a
   hundred hand-drawn borders redrawn three times a second, a few hundred SMIL
   animations, a full viewport particle canvas and six parallaxed painted
   layers under a filter. Without GPU acceleration all of that lands on one CPU
   core, and it does not just look choppy, it starves the main thread badly
-  enough to interrupt the audio scheduler. The light mode keeps **every sound
-  and both music modes exactly as they are** and only stops drawing so much:
+  enough to interrupt the audio scheduler. Lite mode keeps **every sound and
+  both music modes exactly as they are** and only stops drawing so much:
   measured, it takes the page from 874 running animations, 272 SMIL timelines,
   a canvas and 98 promoted compositor layers down to zero of each. The page
   offers it after measuring real dropped frames, never from a user-agent
   guess, and it can be toggled at any time. You can also link straight to it
-  with `?draw=light`, or force the full version with `?draw=full`.
+  with `?draw=lite`, or force the full drawing with `?draw=full`.
 
 ## Running it
 

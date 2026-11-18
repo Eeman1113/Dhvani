@@ -5,7 +5,7 @@ import { RoughBorder } from "@/components/Rough";
 import { dismissOffer, setTier, useMeasuredFps, usePerfOffer } from "@/lib/perf";
 
 /**
- * The offer to switch to the lightweight build.
+ * The offer to switch to lite mode.
  *
  * Shown only after actually measuring dropped frames on this machine, never
  * from a user-agent guess. It says what was measured, because "your computer
@@ -78,14 +78,16 @@ export function PerfOffer() {
 
           <p id="perf-body" className="mt-2 text-[0.9rem] leading-relaxed" style={{ color: "var(--ink-soft)" }}>
             {fps ? `Frames are landing at about ${fps} a second. ` : ""}
-            There is a lighter version that draws far less. It keeps{" "}
+There is a <strong style={{ color: "var(--ink)" }}>lite mode</strong>{" "}
+            that draws far less. It keeps{" "}
             <strong style={{ color: "var(--ink)" }}>every sound and both music modes</strong>,
-            exactly as they are. Only the moving background, the particles and
-            the redrawn lines go away.
+            exactly as they are, and it is nothing to do with the paper
+            colour. Only the moving background, the particles and the
+            redrawn lines go away.
           </p>
           <p className="mt-2 text-[0.8rem] leading-relaxed" style={{ color: "var(--ink-soft)" }}>
-            On a machine this busy the drawing can interrupt the music, so the
-            light version usually sounds better too. You can switch back at any
+            On a machine this busy the drawing can interrupt the music, so
+            lite mode usually sounds better too. You can switch back at any
             time from the menu.
           </p>
 
@@ -98,7 +100,7 @@ export function PerfOffer() {
             >
               <RoughBorder seedKey="perf-yes" radius={13} stroke="var(--accent)" strokeWidth={2.4} />
               <span className="hand relative z-10 text-base" style={{ color: "var(--ink)" }}>
-                yes, load the light version
+                yes, use lite mode
               </span>
             </button>
 
@@ -109,7 +111,7 @@ export function PerfOffer() {
             >
               <RoughBorder seedKey="perf-no" radius={13} stroke="var(--ink)" strokeWidth={1.5} opacity={0.45} />
               <span className="hand relative z-10 text-base" style={{ color: "var(--ink-soft)" }}>
-                no, keep it as it is
+                no, keep drawing everything
               </span>
             </button>
           </div>
