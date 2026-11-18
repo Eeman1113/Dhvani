@@ -1,0 +1,120 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { Doodle } from "@/components/doodles";
+import { RoughBorder } from "@/components/Rough";
+import { useDhvani } from "@/lib/store";
+import { useMotion } from "@/lib/useMotion";
+import type { Sound } from "@/audio/catalogue";
+
+export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
+  const level = useDhvani((s) => s.levels[sound.id] ?? 0);
+  const setSound = useDhvani((s) => s.setSound);
+  const active = level > 0;
+  const [showNote, setShowNote] = useState(false);
+  const sliderRef = useRef<HTMLInputElement>(null);
+
+  // The whole card has weight. Active cards ride the mix; idle ones just
+  // breathe, with a phase offset so a row never moves in lockstep.
+  const ref = useMotion<HTMLDivElement>({
+    active,
+    band: "rms",
+    lift: active ? 5 : 0,
+    scale: active ? 0.028 : 0,
+    tilt: active ? 0.9 : 0,
+    punch: 0.7,
+    idle: active ? 1 : 0.55,
+    phase: index * 0.7,
+  });
+
+  return (
+    <div ref={ref} className="relative will-change-transform">
+      <div
+        className="relative flex flex-col items-center gap-2 rounded-[18px] px-3 pb-3 pt-4 transition-colors duration-500"
+        style={{
+          background: active ? "var(--wash)" : "var(--paper-2)",
+        }}
+      >
+        <RoughBorder
+          seedKey={sound.id}
+          stroke={active ? "var(--accent)" : "var(--ink)"}
+          strokeWidth={active ? 2.6 : 1.8}
+          opacity={active ? 1 : 0.42}
+        />
+
+        <button
+          type="button"
+          onClick={() => setSound(sound.id, active ? 0 : sound.defaultLevel)}
+          className="relative z-10 flex w-full flex-col items-center gap-1.5"
+          aria-pressed={active}
+          aria-label={`${sound.name}${active ? ", playing" : ""}`}
+        >
+          <span
+            className="h-14 w-14 transition-opacity duration-500"
+            style={{ opacity: active ? 1 : 0.42 }}
+          >
+            <Doodle name={sound.doodle} active={active} id={sound.id} />
+          </span>
+          <span className="flex items-baseline gap-1.5 leading-none">
+            <span className="hand text-[1.05rem]" style={{ color: "var(--ink)" }}>
+              {sound.name}
+            </span>
+            <span className="jp text-[0.62rem]" style={{ color: "var(--ink-soft)" }}>
+              {sound.jp}
+            </span>
+          </span>
+        </button>
+
+        <div
+          className="relative z-10 w-full overflow-hidden transition-all duration-500"
+          style={{ height: active ? 24 : 0, opacity: active ? 1 : 0 }}
+        >
+          <input
+            ref={sliderRef}
+            type="range"
+            min={0.02}
+            max={1}
+            step={0.01}
+            value={level || 0.02}
+            onChange={(e) => setSound(sound.id, Number(e.target.value))}
+            className="ink-slider"
+            aria-label={`${sound.name} volume`}
+            tabIndex={active ? 0 : -1}
+          />
+        </div>
+
+        {sound.kind === "sample" && (
+          // A small ear, marking the handful of sounds that are recordings of
+          // a real place rather than synthesis. The credits page says whose.
+          <span
+            className="absolute left-2 top-2 z-10 text-[0.62rem] leading-none"
+            style={{ color: "var(--ink-soft)", opacity: active ? 0.75 : 0.4 }}
+            title="A field recording, not synthesised. See the credits page."
+          >
+            録
+          </span>
+        )}
+
+        <button
+          type="button"
+          onClick={() => setShowNote((v) => !v)}
+          className="absolute right-2 top-2 z-10 h-5 w-5 rounded-full text-[0.7rem] leading-none transition-opacity"
+          style={{ color: "var(--ink-soft)", opacity: showNote ? 1 : 0.35 }}
+          aria-label={`How ${sound.name} is made`}
+          aria-expanded={showNote}
+        >
+          ?
+        </button>
+
+        {showNote && (
+          <p
+            className="relative z-10 px-1 pt-1 text-center text-[0.68rem] leading-snug"
+            style={{ color: "var(--ink-soft)" }}
+          >
+            {sound.note}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
