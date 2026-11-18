@@ -22,14 +22,27 @@ import { THEMES } from "@/lib/themes";
 
 const TIMER_OPTIONS = [25, 50, 90, 180, 480];
 
-function useDismiss(open: boolean, close: () => void, refs: React.RefObject<HTMLElement | null>[]) {
+/**
+ * Escape and click-outside for a popover.
+ *
+ * The refs are passed individually rather than in an array because building
+ * the array during render, or stashing it in another ref, reads a ref in the
+ * render phase, which is not safe under concurrent rendering.
+ */
+function useDismiss(
+  open: boolean,
+  close: () => void,
+  a: React.RefObject<HTMLElement | null>,
+  b: React.RefObject<HTMLElement | null>,
+) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
     const onDown = (e: PointerEvent) => {
-      if (!refs.some((r) => r.current?.contains(e.target as Node))) close();
+      const t = e.target as Node;
+      if (!a.current?.contains(t) && !b.current?.contains(t)) close();
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onDown);
@@ -37,8 +50,7 @@ function useDismiss(open: boolean, close: () => void, refs: React.RefObject<HTML
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onDown);
     };
-    // refs is a stable array of stable refs
-  }, [open, close, refs]);
+  }, [open, close, a, b]);
 }
 
 function timerLabel(ms: number | null) {
@@ -159,8 +171,7 @@ function DesktopTimer() {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const popRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
-  const refs = useRef([triggerRef, popRef]).current;
-  useDismiss(open, close, refs);
+  useDismiss(open, close, triggerRef, popRef);
 
   const label = timerLabel(left);
   return (
