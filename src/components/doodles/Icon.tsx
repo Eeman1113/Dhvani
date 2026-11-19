@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useMemo } from "react";
-import { ICON_PATHS } from "./icons";
+import { ICON_PATHS, type IconName } from "./icons";
 import { LiteContext } from "./Anim";
 import { useMotion } from "@/lib/useMotion";
 import { hashString, seeded } from "@/lib/rough";
@@ -97,7 +97,7 @@ const MOTION: Record<string, { band?: "bass" | "mid" | "air"; punch?: number; sc
   brown: { band: "bass" },
 };
 
-export function Icon({ name, active }: { name: string; active: boolean }) {
+export function Icon({ name, active }: { name: IconName; active: boolean }) {
   const lite = useContext(LiteContext);
   const d = ICON_PATHS[name];
   const m = MOTION[name] ?? {};

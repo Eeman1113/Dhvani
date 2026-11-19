@@ -9,6 +9,7 @@ import { useMotion } from "@/lib/useMotion";
 import { useLite } from "@/lib/perf";
 import { musicNowPlaying, rerollMusic } from "@/audio/mixer";
 import type { DeckMode } from "@/audio/lofi/engine";
+import type { IconName } from "@/components/doodles/icons";
 
 /**
  * The music deck.
@@ -24,7 +25,8 @@ const MODES: {
   id: DeckMode;
   name: string;
   jp: string;
-  doodle: string;
+  /** Same compile-time guarantee as the sound cards. */
+  doodle: IconName;
   blurb: string;
 }[] = [
   {
