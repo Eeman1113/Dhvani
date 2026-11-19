@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { subscribeFrame, type Levels } from "@/audio/engine";
 import { signals } from "@/lib/signals";
 import { asset } from "@/lib/asset";
+import { useLite } from "@/lib/perf";
 
 /**
  * Weather.
@@ -65,8 +66,12 @@ const SPRITE_SRCS = [
 
 export function Particles() {
   const ref = useRef<HTMLCanvasElement>(null);
+  const lite = useLite();
 
   useEffect(() => {
+    // A full viewport canvas cleared and repainted every frame is the single
+    // most expensive thing on the page without a GPU.
+    if (lite) return;
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d", { alpha: true });
@@ -337,7 +342,9 @@ export function Particles() {
       unsub();
       ro.disconnect();
     };
-  }, []);
+  }, [lite]);
+
+  if (lite) return null;
 
   return (
     <canvas

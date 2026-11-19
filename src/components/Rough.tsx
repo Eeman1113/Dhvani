@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { LiteContext } from "@/components/doodles/Anim";
 import {
   circlePoints,
   hashString,
@@ -34,9 +35,14 @@ function Frames({
   opacity: number;
 }) {
   const strokeless = stroke === "none" || strokeWidth === 0;
+  const lite = useContext(LiteContext);
+  // One frame, actually rendered. Setting opacity to 0 on the other two left
+  // them in the render tree, which measured 6 ms a frame and a third of the
+  // cost of every whole-document style recalculation.
+  const shown = lite ? frames.slice(0, 1) : frames;
   return (
     <>
-      {frames.map((paths, i) => (
+      {shown.map((paths, i) => (
         <g key={i} className={`boil-${i}`} opacity={opacity}>
           {(strokeless ? paths.slice(0, 1) : paths).map((d, k) => (
             <path

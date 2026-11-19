@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useDhvani } from "@/lib/store";
 import { THEME_BY_ID, themeVars } from "@/lib/themes";
 import { hydrateStore } from "@/lib/store";
+import { startWatching } from "@/lib/perf";
 
 export function ThemeProvider() {
   const theme = useDhvani((s) => s.theme);
@@ -13,6 +14,9 @@ export function ThemeProvider() {
   // hydration-erroring the whole tree.
   useEffect(() => {
     hydrateStore();
+    // Reads a stored tier choice, or starts measuring real frames to decide
+    // whether to offer the lighter build.
+    return startWatching();
   }, []);
 
   useEffect(() => {

@@ -29,11 +29,32 @@ export type Filler = (from: number, to: number) => void;
  * the window has to be wide enough to ride out a long React commit or a GC
  * pause; anything longer than this is not a backlog, it is a silent hole in
  * every voice at once.
+ *
+ * Eight seconds, as insurance rather than as the fix.
+ *
+ * Worth being precise about the failure this guards against, because the
+ * obvious reading is wrong. The music stopping on a slow machine was not a
+ * single long stall overrunning the window: profiling put the longest
+ * main-thread block at 49 ms and the worst worker-tick lateness at 113 ms,
+ * both of which a four second window absorbs easily.
+ *
+ * The real mechanism was sustained occupancy. The full tier was spending
+ * roughly 480 ms of main-thread rendering per second of wall clock, so on a
+ * machine several times slower the main thread is oversubscribed and the
+ * window drains faster than it can be refilled. Against that, window length
+ * only changes how long it takes to empty: four seconds and eight seconds
+ * both run dry. The thing that actually fixed it was drawing less, which is
+ * what the light tier does.
+ *
+ * The wider window is still worth having, because it costs nothing except a
+ * fader change taking slightly longer to be heard, and it comfortably covers
+ * every single stall that was actually observed.
  */
-const LOOKAHEAD = 4.0;
+const LOOKAHEAD = 8.0;
 const TICK_MS = 120;
 
 const fillers = new Set<Filler>();
+const reported = new WeakSet<Filler>();
 let worker: Worker | null = null;
 let fallbackTimer: ReturnType<typeof setInterval> | null = null;
 let filledUntil = 0;
@@ -87,10 +108,12 @@ function tick() {
       f(from, target);
     } catch (err) {
       // One bad voice must not stop the rest of the mix. But swallowing the
-      // error outright makes a scheduling bug look like silence, which is
-      // very hard to debug, so say so while developing.
-      if (process.env.NODE_ENV !== "production") {
-        console.error("[dhvani] clock filler threw:", err);
+      // error outright makes a scheduling bug look exactly like a silent
+      // stall, so it is reported once in any build. Once, because a filler
+      // that throws tends to throw every tick.
+      if (!reported.has(f)) {
+        reported.add(f);
+        console.error("[dhvani] a scheduled voice threw and was dropped:", err);
       }
     }
   }

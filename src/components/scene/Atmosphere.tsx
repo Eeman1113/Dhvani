@@ -15,6 +15,7 @@ import { useEffect, useRef } from "react";
 import { subscribeFrame, type Levels } from "@/audio/engine";
 import { signals, refreshSignals, stepSignals } from "@/lib/signals";
 import { Particles } from "./Particles";
+import { useLite } from "@/lib/perf";
 import { asset } from "@/lib/asset";
 
 /**
@@ -62,6 +63,97 @@ function layerBudget() {
 }
 
 export function Atmosphere() {
+  const lite = useLite();
+  if (lite) return <LiteAtmosphere />;
+  return <FullAtmosphere />;
+}
+
+/**
+ * The light sky.
+ *
+ * No images, no filter, no canvas, no parallax and nothing written per frame.
+ * It is two CSS gradients whose colours are driven by the mix a few times a
+ * second, which is enough to keep the page answering what you are playing:
+ * fire still warms the paper from below, rain still cools it, night still
+ * darkens it. That was always the point of the background. The clouds were
+ * only ever the expensive way to say it.
+ */
+function LiteAtmosphere() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let raf = 0;
+    let last = "";
+    let acc = 0;
+    let prev = performance.now();
+
+    const loop = (now: number) => {
+      raf = requestAnimationFrame(loop);
+      const dt = Math.min((now - prev) / 1000, 0.1);
+      prev = now;
+      acc += dt;
+      // Four times a second. Colour does not need sixty.
+      if (acc < 0.25) return;
+      refreshSignals();
+      stepSignals(acc);
+      acc = 0;
+
+      const s = signals;
+      const warm = s.fire;
+      const cold = Math.max(s.rain, s.snow) * 0.8;
+      const dark = s.night;
+
+      // One gradient, not three stacked ones. Each full-viewport gradient
+      // costs about 4 ms of CPU raster and they repaint together, so three
+      // was 12 ms every time this changed. The warm, cold and night
+      // contributions are mixed into a single pass instead.
+      const r = Math.round(255 * warm + 104 * cold + 26 * dark);
+      const g = Math.round(176 * warm + 134 * cold + 28 * dark);
+      const b = Math.round(94 * warm + 176 * cold + 48 * dark);
+      const aBottom = (warm * 0.3 + dark * 0.22).toFixed(2);
+      const aTop = (cold * 0.26 + dark * 0.26).toFixed(2);
+      const next =
+        `linear-gradient(180deg, rgba(${r},${g},${b},${aTop}) 0%, rgba(${r},${g},${b},0) 48%, rgba(${r},${g},${b},${aBottom}) 100%)`;
+      if (next !== last && ref.current) {
+        ref.current.style.background = next;
+        last = next;
+      }
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div className="pointer-events-none fixed inset-0 overflow-hidden" style={{ zIndex: 0 }} aria-hidden>
+      {/*
+        Painted once and never touched again. Lite still needs somewhere for
+        the page to sit: a warm pool of light where the paper curves, a cooler
+        wash at the top, and the suggestion of a horizon low down. It is the
+        same composition as the full scene, said in three gradients instead of
+        six images, a filter and a canvas.
+      */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(90% 55% at 50% 108%, color-mix(in oklab, var(--accent) 16%, transparent) 0%, transparent 70%)," +
+            "radial-gradient(120% 70% at 50% -16%, color-mix(in oklab, var(--accent-2) 11%, transparent) 0%, transparent 72%)," +
+            "linear-gradient(180deg, transparent 58%, color-mix(in oklab, var(--line) 30%, transparent) 86%, color-mix(in oklab, var(--line) 12%, transparent) 100%)",
+        }}
+      />
+      <div ref={ref} className="absolute inset-0" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(120% 100% at 50% 45%, transparent 58%, color-mix(in oklab, var(--ink) 8%, transparent) 100%)",
+        }}
+      />
+    </div>
+  );
+}
+
+function FullAtmosphere() {
   const sky = useRef<HTMLDivElement>(null);
   const mountains = useRef<HTMLDivElement>(null);
   const enso = useRef<HTMLDivElement>(null);
@@ -115,6 +207,7 @@ export function Atmosphere() {
     let birdFlight = -1;
 
     let refreshIn = 0;
+    let lastSky = "";
 
     const step = (levels: Levels, dt: number) => {
       // The signal clock lives here rather than in the particle layer, because
@@ -148,10 +241,18 @@ export function Atmosphere() {
         sky.current.style.opacity = String(
           0.1 + Math.max(warm, cold, dark) * 0.5 + s.activity * 0.08,
         );
-        sky.current.style.background =
-          `radial-gradient(120% 90% at 50% 112%, rgba(255,176,94,${(warm * 0.5).toFixed(3)}) 0%, rgba(255,176,94,0) 60%),` +
-          `radial-gradient(100% 70% at 50% -12%, rgba(104,134,176,${(cold * 0.45).toFixed(3)}) 0%, rgba(104,134,176,0) 70%),` +
-          `linear-gradient(180deg, rgba(26,28,48,${(dark * 0.42).toFixed(3)}) 0%, rgba(26,28,48,${(dark * 0.1).toFixed(3)}) 55%, rgba(26,28,48,${(dark * 0.3).toFixed(3)}) 100%)`;
+        // Quantised to two decimals and only assigned when it actually
+        // changes. Building the string is free; the full-viewport repaint it
+        // triggers is about 12 ms of raster, so doing it 60 times a second
+        // for a value that moves imperceptibly is the whole cost.
+        const nextSky =
+          `radial-gradient(120% 90% at 50% 112%, rgba(255,176,94,${(warm * 0.5).toFixed(2)}) 0%, rgba(255,176,94,0) 60%),` +
+          `radial-gradient(100% 70% at 50% -12%, rgba(104,134,176,${(cold * 0.45).toFixed(2)}) 0%, rgba(104,134,176,0) 70%),` +
+          `linear-gradient(180deg, rgba(26,28,48,${(dark * 0.42).toFixed(2)}) 0%, rgba(26,28,48,${(dark * 0.1).toFixed(2)}) 55%, rgba(26,28,48,${(dark * 0.3).toFixed(2)}) 100%)`;
+        if (nextSky !== lastSky) {
+          sky.current.style.background = nextSky;
+          lastSky = nextSky;
+        }
       }
 
       /* --- mountains ----------------------------------------------- */

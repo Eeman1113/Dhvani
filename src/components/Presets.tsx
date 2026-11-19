@@ -6,6 +6,7 @@ import { Doodle } from "@/components/doodles";
 import { RoughBorder } from "@/components/Rough";
 import { useDhvani } from "@/lib/store";
 import { useMotion } from "@/lib/useMotion";
+import { useLite } from "@/lib/perf";
 
 /**
  * Ways in.
@@ -78,9 +79,10 @@ function faceOf(preset: Preset) {
 }
 
 function Big({ preset, index, onClick }: { preset: Preset; index: number; onClick: () => void }) {
+  const lite = useLite();
   const ref = useMotion<HTMLDivElement>({ active: false, lift: 0, scale: 0, idle: 0.7, phase: index * 1.3 });
   return (
-    <div ref={ref} className="relative will-change-transform">
+    <div ref={ref} className={`relative ${lite ? "" : "will-change-transform"}`}>
       <button type="button" onClick={onClick} className="group block w-full text-left">
         <span
           className="relative flex items-start gap-3 rounded-[18px] px-4 py-4 transition-transform duration-200 group-hover:-translate-y-[3px] group-active:scale-95"
@@ -110,9 +112,10 @@ function Big({ preset, index, onClick }: { preset: Preset; index: number; onClic
 }
 
 function Small({ preset, index, onClick }: { preset: Preset; index: number; onClick: () => void }) {
+  const lite = useLite();
   const ref = useMotion<HTMLDivElement>({ active: false, lift: 0, scale: 0, idle: 0.5, phase: index * 0.9 });
   return (
-    <div ref={ref} className="relative will-change-transform">
+    <div ref={ref} className={`relative ${lite ? "" : "will-change-transform"}`}>
       <button type="button" onClick={onClick} className="group block w-full text-left">
         <span
           className="relative block rounded-[14px] px-3 py-2.5 transition-transform duration-200 group-hover:-translate-y-[2px] group-active:scale-95"

@@ -8,6 +8,8 @@
 recordings, and a generative music deck that writes lofi and classical nocturnes
 one bar at a time. Put it on and leave it on.
 
+Made by **Eeman Majumder**
+
 </div>
 
 ---
@@ -47,6 +49,18 @@ scheduler. There is no hour two, because there is nothing to come back around.
   the sheet darkens and fireflies come out.
 - **Six papers** built from traditional Japanese colours, a sleep timer, and a
   mix that survives a reload.
+- **Lite mode** for older machines (nothing to do with the paper colour). Dhvani draws a lot: around a
+  hundred hand-drawn borders redrawn three times a second, a few hundred SMIL
+  animations, a full viewport particle canvas and six parallaxed painted
+  layers under a filter. Without GPU acceleration all of that lands on one CPU
+  core, and it does not just look choppy, it starves the main thread badly
+  enough to interrupt the audio scheduler. Lite mode keeps **every sound and
+  both music modes exactly as they are** and only stops drawing so much:
+  measured, it takes the page from 874 running animations, 272 SMIL timelines,
+  a canvas and 98 promoted compositor layers down to zero of each. The page
+  offers it after measuring real dropped frames, never from a user-agent
+  guess, and it can be toggled at any time. You can also link straight to it
+  with `?draw=lite`, or force the full drawing with `?draw=full`.
 
 ## Running it
 
@@ -143,8 +157,13 @@ and re-encoded; `AUDIO_SOURCES.md` records exactly what was done to each file.
 
 ### Art and code
 
-- The logo is the word **ध्वनि** written in felt tip by **Eeman Majumder**,
-  photographed, cut out of its background and traced to vector.
+- **Dhvani is made by [Eeman Majumder](https://github.com/Eeman1113).** The
+  synthesis, the generative music, the drawing system and everything else here,
+  except where noted below.
+- **Logo by [Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/).**
+  The word **ध्वनि** in her own handwriting, written in felt tip on a sheet of
+  paper, photographed, cut out of its background and traced to vector. The
+  waver in the shirorekha is hers, and not a letterform has been corrected.
 - The painted background art (clouds, mist, mountains, moon, enso, leaves,
   birds) was generated with an image model, then cut apart, graded per theme and
   parallaxed by hand.
@@ -155,5 +174,7 @@ and re-encoded; `AUDIO_SOURCES.md` records exactly what was done to each file.
 
 ## Licence
 
-Code is MIT. The field recordings are CC0 and carry no conditions. The logo is
-Eeman Majumder's own handwriting; please do not pass it off as your own.
+Code is MIT, copyright Eeman Majumder. The field recordings are CC0 and carry
+no conditions. The logo is
+[Sakshi Sawarkar](https://www.linkedin.com/in/sakshi-sawarkar/)'s handwriting,
+used with permission; please do not pass it off as your own.

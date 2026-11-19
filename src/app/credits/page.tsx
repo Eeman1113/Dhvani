@@ -389,11 +389,48 @@ export default function Credits() {
           </Section>
 
           <Section id="made" title="Everything else" jp="他">
-            <Card seed="c-logo">
-              <Term word="The logo">
-                the word ध्वनि, written in felt-tip on a sheet of paper by Eeman
-                Majumder, photographed, cut out of its background and traced to
-                vector. The waver in the shirorekha is the real one.
+            <div
+              className="relative flex flex-col items-center gap-4 rounded-[18px] px-5 py-5 sm:flex-row sm:items-start sm:gap-6"
+              style={{ background: "var(--paper-2)" }}
+            >
+              <RoughBorder seedKey="c-sakshi" radius={18} stroke="var(--accent)" strokeWidth={2} opacity={0.7} />
+              <div className="relative z-10 shrink-0">
+                <Logo height={54} reactive={false} />
+              </div>
+              <p className="relative z-10 text-[0.92rem] leading-relaxed" style={{ color: "var(--ink-soft)" }}>
+                The logo is the word{" "}
+                <span className="deva" style={{ color: "var(--ink)" }}>
+                  ध्वनि
+                </span>{" "}
+                handwritten by{" "}
+                <a
+                  href="https://www.linkedin.com/in/sakshi-sawarkar/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tap underline-offset-4 hover:underline"
+                  style={{ color: "var(--accent-text)" }}
+                >
+                  <strong>Sakshi Sawarkar</strong>
+                </a>
+                . She wrote it in felt-tip on a sheet of paper, and that sheet
+                is what you are looking at: it was photographed, lifted off its
+                background and traced to vector, and nothing else was done to
+                it. The thick and thin of the stroke are where her pen slowed
+                down and sped up. The shirorekha, the line that runs along the
+                top and binds the letters together, is not straight, because
+                nobody draws a straight line by hand and she did not. It would
+                have taken ten minutes to tidy all of that up, and it is the
+                entire reason the mark is worth having. Every hand-drawn edge
+                elsewhere in this app, every border that will not sit still, is
+                in the end an attempt to deserve this one real thing.
+              </p>
+            </div>
+
+            <Card seed="c-author">
+              <Term word="Dhvani">
+                made by <strong style={{ color: "var(--ink)" }}>Eeman Majumder</strong>.
+                The synthesis, the generative music, the drawing system and
+                everything else here, except where this page says otherwise.
               </Term>
             </Card>
             <Card seed="c-art">
@@ -441,8 +478,25 @@ export default function Credits() {
             <Link href="/" className="hand tap text-base underline-offset-4 hover:underline" style={{ color: "var(--accent-text)" }}>
               back to the machine
             </Link>
-            <p className="text-[0.78rem]" style={{ color: "var(--ink-soft)" }}>
-              Made by Eeman Majumder.
+            <p className="text-[0.82rem]" style={{ color: "var(--ink)" }}>
+              Dhvani is made by Eeman Majumder.
+            </p>
+            <p className="text-[0.8rem]" style={{ color: "var(--ink)" }}>
+              Logo by{" "}
+              <a
+                href="https://www.linkedin.com/in/sakshi-sawarkar/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="tap underline-offset-4 hover:underline"
+                style={{ color: "var(--accent-text)" }}
+              >
+                Sakshi Sawarkar
+              </a>
+              .
+            </p>
+            <p className="text-[0.74rem]" style={{ color: "var(--ink-soft)" }}>
+              The field recordings are other people&apos;s, and they are named
+              above.
             </p>
           </footer>
         </main>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { useContext, useId, useMemo } from "react";
+import { LiteContext } from "@/components/doodles/Anim";
 import { hashString, roughFrames, seeded, type Pt } from "@/lib/rough";
 
 /**
@@ -40,6 +41,11 @@ export function InkSlider({
   disabled?: boolean;
 }) {
   const uid = useId().replace(/[^a-zA-Z0-9]/g, "");
+  // The fader draws its own boiling frames rather than going through
+  // <Frames>, so it needs the same treatment: one hand in the light tier,
+  // not three with two of them hidden. With ninety faders on the page these
+  // were most of the animations still running in lite.
+  const lite = useContext(LiteContext);
 
   // The track is generated once per slider. The value moves a clip rectangle
   // over it rather than regenerating the path, so dragging costs one attribute
@@ -88,7 +94,7 @@ export function InkSlider({
         </defs>
 
         {/* the empty part of the run */}
-        {track.map((paths, i) => (
+        {(lite ? track.slice(0, 1) : track).map((paths, i) => (
           <g key={`t${i}`} className={`boil-${i}`}>
             {paths.map((d, k) => (
               <path
@@ -106,7 +112,7 @@ export function InkSlider({
 
         {/* the part you have filled in */}
         {!dim &&
-          track.map((paths, i) => (
+          (lite ? track.slice(0, 1) : track).map((paths, i) => (
             <g key={`f${i}`} className={`boil-${i}`} clipPath={`url(#fill-${uid})`}>
               {paths.map((d, k) => (
                 <path
@@ -134,7 +140,7 @@ export function InkSlider({
           viewBox="-10 -10 20 20"
           aria-hidden
         >
-          {thumbFrames.map((paths, i) => (
+          {(lite ? thumbFrames.slice(0, 1) : thumbFrames).map((paths, i) => (
             <g key={i} className={`boil-${i}`}>
               {paths.map((d, k) => (
                 <path

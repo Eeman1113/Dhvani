@@ -55,6 +55,12 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: var(--font-body);
+  /*
+   * 500, not 400. Zen Maru Gothic is a rounded face with open counters and
+   * at 400 on a tinted paper it reads as faint rather than as light,
+   * especially for the small secondary text this page uses a lot of.
+   */
+  font-weight: 500;
   overflow-x: hidden;
   /* Every colour transition is slow. Switching theme should feel like the
      light changing in a room, not like a toggle. */
@@ -101,11 +107,14 @@ body::after {
 
 .hand {
   font-family: var(--font-hand);
+  /* Caveat is a thin hand at 400 and disappears at small sizes. */
+  font-weight: 600;
   letter-spacing: 0.01em;
 }
 
 .deva {
   font-family: var(--font-deva);
+  font-weight: 700;
 }
 
 .jp {
@@ -309,26 +318,23 @@ input[type="range"].bare-range:focus-visible {
  * stays a 20 px text link and still catches a thumb.
  */
 /*
- * Deliberately no `position` here. These are plain CSS and therefore outside
- * Tailwind's layers, so declaring position would beat an `absolute` utility
- * on the same element. It did, once, and moved every card's help button from
- * the top corner to the middle of the card.
+ * Size only. No `display`, no `position`.
+ *
+ * This file is plain CSS and therefore sits outside Tailwind's layers, which
+ * means anything declared here beats a Tailwind utility on the same element
+ * no matter the specificity. Declaring `position` here once moved every
+ * card's help button out of its corner; declaring `display` here once beat
+ * `sm:hidden` and left the mobile menu button showing on desktop, where
+ * tapping it did nothing because the sheet it opens is itself `sm:hidden`.
+ *
+ * Call sites that need centring add `inline-flex items-center` themselves,
+ * where Tailwind can still override it.
  */
-.tap {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-}
-.tap-sq {
-  min-width: 44px;
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
+.tap { min-height: 44px; }
+.tap-sq { min-width: 44px; min-height: 44px; }
 @media (pointer: fine) {
-  /* A mouse does not need the padding, and on a dense desktop bar it would
-     push everything apart for no reason. */
+  /* A mouse does not need the padding, and on a dense bar it would push
+     everything apart for no reason. */
   .tap { min-height: 32px; }
   .tap-sq { min-width: 32px; min-height: 32px; }
 }
@@ -362,3 +368,95 @@ html { scroll-padding-top: 5rem; }
   /* dvh accounts for mobile browser chrome appearing and disappearing. */
   .min-h-screen-d { min-height: 100dvh; }
 }
+
+/*
+ * Skip the work for cards that are not on screen.
+ *
+ * There are around ninety sound cards and at most a dozen are ever visible.
+ * `content-visibility: auto` lets the browser skip style, layout and paint
+ * for the rest, which on this page also means skipping their hand-drawn
+ * borders and every animation inside them. The intrinsic size keeps the
+ * scrollbar honest while they are skipped.
+ */
+.card-skip {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 168px;
+}
+
+/* ------------------------------------------------------------------ */
+/* the light tier                                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * What lite removes, and why.
+ *
+ * Every rule here targets something that is cheap with a GPU and brutal
+ * without one. On software compositing a filter over a large subtree, a
+ * blend mode on a full-viewport layer, a backdrop blur, and a hundred
+ * promoted layers each cost real milliseconds of CPU on every single frame.
+ *
+ * It removes no sound, no music mode and no control. The page still has
+ * paper, ink, hand-drawn edges and colour that answers the mix. It simply
+ * stops redrawing all of it sixty times a second.
+ */
+
+/* The boil: three copies of every line cycling at 8 fps. By far the largest
+   number of animated elements on the page. Lite keeps the first frame, so
+   the lines are still drawn by hand, they just hold still. */
+[data-perf="lite"] .boil-0 { animation: none !important; opacity: 1 !important; }
+
+/* Continuous decorative motion. Lite keeps these only inside a card that is
+   actually playing, which is usually a handful of elements rather than a
+   hundred and fifty. */
+[data-perf="lite"] .anim-fall,
+[data-perf="lite"] .anim-flicker,
+[data-perf="lite"] .anim-sway,
+[data-perf="lite"] .anim-spin,
+[data-perf="lite"] .anim-ripple,
+[data-perf="lite"] .anim-bobble,
+[data-perf="lite"] .breathe,
+[data-perf="lite"] .drift {
+  animation: none !important;
+}
+[data-perf="lite"] [data-playing="true"] .anim-flicker,
+[data-perf="lite"] [data-playing="true"] .anim-spin,
+[data-perf="lite"] [data-playing="true"] .anim-sway,
+[data-perf="lite"] [data-playing="true"] .anim-bobble {
+  animation-duration: var(--d, 2.4s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-name: inherit;
+}
+[data-perf="lite"] [data-playing="true"] .anim-flicker { animation-name: flicker; }
+[data-perf="lite"] [data-playing="true"] .anim-spin { animation-name: spin; animation-timing-function: linear; }
+[data-perf="lite"] [data-playing="true"] .anim-sway { animation-name: sway; }
+[data-perf="lite"] [data-playing="true"] .anim-bobble { animation-name: bobble; }
+
+/* A blur of the live page behind a sticky bar is recomputed on every scroll
+   frame, over the full width of the window. */
+[data-perf="lite"] header { backdrop-filter: none !important; }
+
+/* Two fixed, full-viewport pseudo elements, one of them with a blend mode.
+   The grain is lovely and it is not worth a repaint of the whole screen. */
+[data-perf="lite"] body::before { opacity: 0.32; mix-blend-mode: normal; }
+[data-perf="lite"] body::after { display: none; }
+
+/* The promoted layers are not overridden here; the class is simply not
+   applied in lite. Cancelling it with !important would leave the element
+   promoted-then-unpromoted and still lose subpixel text antialiasing. */
+
+/*
+ * Scoped, not universal.
+ *
+ * This was written as `[data-perf="lite"] *` and that was a bad mistake: it
+ * put a 180 ms transition on every one of ~5300 elements, so a theme switch
+ * or a card activation animated the entire document. Measured, it took the
+ * light tier from 52 ms a frame to 110 ms during those moments, which is the
+ * exact opposite of the point. Only the things that actually change colour
+ * need a duration.
+ */
+[data-perf="lite"] .transition-colors { transition-duration: 180ms; }
+
+/* The hand still shakes when you touch something; it just does not shake
+   continuously everywhere. */
+[data-perf="lite"] .boil-0 { transition: none; }
