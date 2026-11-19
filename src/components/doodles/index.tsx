@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 import { Icon } from "./Icon";
-import { ICON_PATHS } from "./icons";
+import { ICON_PATHS, type IconName } from "./icons";
 import { LiteContext } from "./Anim";
 
 /**
@@ -17,7 +17,7 @@ import { LiteContext } from "./Anim";
  * `data-playing` lets the light tier animate only what you are actually
  * listening to.
  */
-export function Doodle({ name, active }: { name: string; active: boolean; id?: string }) {
+export function Doodle({ name, active }: { name: IconName; active: boolean; id?: string }) {
   const lite = useContext(LiteContext);
   void lite;
   return (
@@ -41,7 +41,7 @@ export const DOODLE_NAMES = Object.keys(ICON_PATHS);
  */
 export const DOODLES: Record<string, React.FC<{ active: boolean; id?: string }>> =
   Object.fromEntries(
-    Object.keys(ICON_PATHS).map((name) => [
+    (Object.keys(ICON_PATHS) as IconName[]).map((name) => [
       name,
       function DoodleIcon({ active }: { active: boolean; id?: string }) {
         return <Icon name={name} active={active} />;

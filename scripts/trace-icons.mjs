@@ -163,8 +163,16 @@ const header = `/**
  * rest of the interface. Do not edit by hand; regenerate instead.
  */
 
-export const ICON_PATHS: Record<string, string> = ${JSON.stringify(results, null, 0)};
+export const ICON_PATHS = ${JSON.stringify(results, null, 0)} as const;
 
+/**
+ * The icons that actually exist.
+ *
+ * Deliberately NOT \`Record<string, string>\`: that annotation erases the
+ * literal keys, so \`keyof\` collapses to \`string\` and a card referring to an
+ * icon nobody drew compiles happily and renders a blank square. Inferred
+ * from the object, this is a union of the real names.
+ */
 export type IconName = keyof typeof ICON_PATHS;
 `;
 writeFileSync(outFile, header);

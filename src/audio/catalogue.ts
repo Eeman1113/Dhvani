@@ -1,4 +1,5 @@
 import type { ThemeId } from "@/lib/themes";
+import type { IconName } from "@/components/doodles/icons";
 
 export type SoundGroup =
   | "ame"
@@ -37,8 +38,14 @@ export type Sound = {
   name: string;
   jp: string;
   group: SoundGroup;
-  /** Which doodle to draw on the card. */
-  doodle: string;
+  /**
+   * Which icon to draw on the card.
+   *
+   * Typed to the icons that actually exist rather than to string: a name
+   * with no artwork behind it renders as a blank square, which is invisible
+   * in review and shipped once already. Now it does not compile.
+   */
+  doodle: IconName;
   /** Starting fader position, 0..1. Tuned so a fresh stack sits balanced. */
   defaultLevel: number;
   /** Shown on the card back / credits page. */
