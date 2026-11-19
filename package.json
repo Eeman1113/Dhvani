@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mac:assets": "node scripts/build-mac.mjs",
+    "mac:build": "node scripts/build-mac.mjs && cd macos && xcodegen && xcodebuild -project Dhvani.xcodeproj -scheme Dhvani -configuration Release -derivedDataPath build build"
   },
   "dependencies": {
     "next": "16.4.6",
@@ -19,6 +21,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.25.10",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
     "potrace": "^2.1.8",

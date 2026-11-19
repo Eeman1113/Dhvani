@@ -64,6 +64,37 @@ NEXT_PUBLIC_BASE_PATH=/Dhvani npm run build
 There is no server, no database and no account. Everything happens in the
 browser, and the mix is stored in `localStorage` and nowhere else.
 
+## The Mac app
+
+`macos/` is Dhvani as a native macOS 26 app that lives in the menu bar. The
+interface is SwiftUI with Liquid Glass, drawn in the site's papers, fonts,
+doodles and hand-inked borders. The sound is the site's own engine: the same
+`src/audio` code, bundled by `src/native/bridge.ts` and run in a web view
+that is never on screen, so the app and the site sound identical.
+
+- **Menu bar panel**: play and pause, master volume, presets in one click
+  (⌘1 to ⌘9), the music deck with its live key and tempo, everything
+  playing with its own fader, and a search box to add any sound.
+- **Presets of your own**: save the current mix, or build one in the
+  editor with sounds, levels, music, master volume, paper and a drawing.
+  Built-in presets can be copied, hidden, reordered, imported and exported.
+- **Mixer window**: every sound grouped as on the site, presets, music.
+- **Settings**: open at login, what to play at launch, Dock icon, pause on
+  sleep, screen lock or when headphones come out, media keys and Control
+  Center, sleep timer fade and end action, global shortcuts, dark paper.
+- **Shortcuts and Spotlight**: play a preset, play or pause, set a sleep timer.
+
+To build it you need Xcode 26 or later and [XcodeGen](https://github.com/yonaskolb/XcodeGen):
+
+```bash
+npm run mac:assets           # engine, catalogue and doodles from the site
+cd macos && xcodegen && open Dhvani.xcodeproj
+```
+
+or `npm run mac:build` for a Release build in `macos/build`. Run
+`mac:assets` again after changing anything in `src/audio`, the catalogue,
+the themes or the doodles.
+
 ## Credits
 
 ### Field recordings

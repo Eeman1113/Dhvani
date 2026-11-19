@@ -1,0 +1,1499 @@
+{
+ "groups": [
+  {
+   "id": "ame",
+   "name": "Rain",
+   "jp": "雨",
+   "blurb": "weather on the other side of the glass"
+  },
+  {
+   "id": "hi",
+   "name": "Fire",
+   "jp": "火",
+   "blurb": "something burning slowly in the room"
+  },
+  {
+   "id": "kaze",
+   "name": "Wind",
+   "jp": "風",
+   "blurb": "air moving through a place you are not"
+  },
+  {
+   "id": "mizu",
+   "name": "Water",
+   "jp": "水",
+   "blurb": "water with somewhere to be"
+  },
+  {
+   "id": "yoru",
+   "name": "Night",
+   "jp": "夜",
+   "blurb": "the hours when the world gets quiet"
+  },
+  {
+   "id": "mori",
+   "name": "Forest",
+   "jp": "森",
+   "blurb": "somewhere with trees over it"
+  },
+  {
+   "id": "hito",
+   "name": "People",
+   "jp": "人",
+   "blurb": "company, without conversation"
+  },
+  {
+   "id": "zen",
+   "name": "Zen",
+   "jp": "禅",
+   "blurb": "struck things, ringing out"
+  },
+  {
+   "id": "shitsu",
+   "name": "Room",
+   "jp": "室",
+   "blurb": "the small machinery of being indoors"
+  },
+  {
+   "id": "tabi",
+   "name": "Travel",
+   "jp": "旅",
+   "blurb": "moving, with nowhere to be yet"
+  },
+  {
+   "id": "oto",
+   "name": "Noise",
+   "jp": "音",
+   "blurb": "the flat colours of sound"
+  }
+ ],
+ "sounds": [
+  {
+   "id": "rain-light",
+   "name": "Light Rain",
+   "jp": "小雨",
+   "group": "ame",
+   "doodle": "rain",
+   "kind": "synth",
+   "defaultLevel": 0.55,
+   "note": "Pink noise shaped to the spectrum of falling water, with individual drops scattered on top.",
+   "credit": null
+  },
+  {
+   "id": "rain-heavy",
+   "name": "Downpour",
+   "jp": "大雨",
+   "group": "ame",
+   "doodle": "downpour",
+   "kind": "synth",
+   "defaultLevel": 0.45,
+   "note": "The same bed, widened and weighted, at four times the drop density.",
+   "credit": null
+  },
+  {
+   "id": "rain-window",
+   "name": "Rain on Glass",
+   "jp": "窓の雨",
+   "group": "ame",
+   "doodle": "window",
+   "kind": "synth",
+   "defaultLevel": 0.5,
+   "note": "Rain heard from inside, with everything above 1.4 kHz taken away by the wall.",
+   "credit": null
+  },
+  {
+   "id": "rain-tent",
+   "name": "Rain on Canvas",
+   "jp": "天幕の雨",
+   "group": "ame",
+   "doodle": "tent",
+   "kind": "synth",
+   "defaultLevel": 0.45,
+   "note": "A stretched surface rings at a pitch when you hit it. That resonance is why a tent sounds nothing like grass.",
+   "credit": null
+  },
+  {
+   "id": "rain-leaves",
+   "name": "Rain in Leaves",
+   "jp": "木の葉の雨",
+   "group": "ame",
+   "doodle": "rainleaf",
+   "kind": "synth",
+   "defaultLevel": 0.45,
+   "note": "Brighter and more scattered, each drop landing on something that gives.",
+   "credit": null
+  },
+  {
+   "id": "thunder",
+   "name": "Distant Thunder",
+   "jp": "遠雷",
+   "group": "ame",
+   "doodle": "thunder",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "A roll every forty seconds or so, at random. Occasionally it lands close.",
+   "credit": null
+  },
+  {
+   "id": "fire",
+   "name": "Campfire",
+   "jp": "焚火",
+   "group": "hi",
+   "doodle": "fire",
+   "kind": "synth",
+   "defaultLevel": 0.55,
+   "note": "A breathing low roar, fine ticking, and the odd pop that splits into splinters.",
+   "credit": null
+  },
+  {
+   "id": "wind",
+   "name": "Low Wind",
+   "jp": "風",
+   "group": "kaze",
+   "doodle": "wind",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Gusts driven by a random walk, so the wind gets brighter as it gets louder.",
+   "credit": null
+  },
+  {
+   "id": "wind-high",
+   "name": "Mountain Wind",
+   "jp": "山風",
+   "group": "kaze",
+   "doodle": "mountain",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Thin air over bare rock. No low body at all, which is the whole difference from the one above.",
+   "credit": null
+  },
+  {
+   "id": "blizzard",
+   "name": "Blizzard",
+   "jp": "吹雪",
+   "group": "kaze",
+   "doodle": "snow",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Hard gusts with fine ice driven against the surface you are sheltering behind.",
+   "credit": null
+  },
+  {
+   "id": "leaves",
+   "name": "Leaves",
+   "jp": "葉擦れ",
+   "group": "kaze",
+   "doodle": "leaves",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Thousands of small ticks whose density rises and falls with the gust.",
+   "credit": null
+  },
+  {
+   "id": "chimes",
+   "name": "Wind Chimes",
+   "jp": "風鈴",
+   "group": "kaze",
+   "doodle": "chime",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "Inharmonic tube partials in a major pentatonic, rung in clusters when the wind catches them.",
+   "credit": null
+  },
+  {
+   "id": "waves",
+   "name": "Ocean",
+   "jp": "波",
+   "group": "mizu",
+   "doodle": "wave",
+   "kind": "synth",
+   "defaultLevel": 0.5,
+   "note": "A nine second swell that drifts over minutes, with foam that only appears at the crest.",
+   "credit": null
+  },
+  {
+   "id": "stream",
+   "name": "Stream",
+   "jp": "小川",
+   "group": "mizu",
+   "doodle": "stream",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Bright moving water, with resonant filter sweeps standing in for bubbles.",
+   "credit": null
+  },
+  {
+   "id": "rapids",
+   "name": "Rapids",
+   "jp": "早瀬",
+   "group": "mizu",
+   "doodle": "rapids",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "The same river in a hurry. Far more churn, and a low bed underneath it.",
+   "credit": null
+  },
+  {
+   "id": "waterfall",
+   "name": "Waterfall",
+   "jp": "滝",
+   "group": "mizu",
+   "doodle": "waterfall",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Mass of falling water surges rather than sitting still, and the spray brightens as it does.",
+   "credit": null
+  },
+  {
+   "id": "underwater",
+   "name": "Underwater",
+   "jp": "水中",
+   "group": "mizu",
+   "doodle": "underwater",
+   "kind": "synth",
+   "defaultLevel": 0.45,
+   "note": "Everything above 320 Hz gone, with bubbles rising in little clusters.",
+   "credit": null
+  },
+  {
+   "id": "cave-drip",
+   "name": "Cave Drips",
+   "jp": "滴り",
+   "group": "mizu",
+   "doodle": "drip",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "A drip is a pitch that rises as the cavity it made closes up. The space answers each one.",
+   "credit": null
+  },
+  {
+   "id": "crickets",
+   "name": "Crickets",
+   "jp": "虫の音",
+   "group": "yoru",
+   "doodle": "cricket",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Seven insects, each with its own pitch, position and tempo, interfering with each other.",
+   "credit": null
+  },
+  {
+   "id": "cicadas",
+   "name": "Cicadas",
+   "jp": "蝉",
+   "group": "yoru",
+   "doodle": "cicada",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "A carrier buzzing near 5 kHz, amplitude modulated in the tens of hertz. The modulation is the insect.",
+   "credit": null
+  },
+  {
+   "id": "frogs",
+   "name": "Frogs",
+   "jp": "蛙",
+   "group": "yoru",
+   "doodle": "frog",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Six throats around a pond, each with its own pulse rate. Pulse rate sets the species as much as pitch.",
+   "credit": null
+  },
+  {
+   "id": "owls",
+   "name": "Owls",
+   "jp": "梟",
+   "group": "yoru",
+   "doodle": "owl",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Nearly a pure tone with a breathy edge, in answering pairs, about three times a minute.",
+   "credit": null
+  },
+  {
+   "id": "crowd-cafe",
+   "name": "Cafe",
+   "jp": "喫茶店",
+   "group": "hito",
+   "doodle": "cafe",
+   "kind": "synth",
+   "defaultLevel": 0.45,
+   "note": "Seven synthetic talkers, cups, and an espresso machine that fires now and then. No two minutes are ever the same.",
+   "credit": null
+  },
+  {
+   "id": "crowd-restaurant",
+   "name": "Restaurant",
+   "jp": "食堂",
+   "group": "hito",
+   "doodle": "plate",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Eleven voices, far more crockery, and people interrupting each other.",
+   "credit": null
+  },
+  {
+   "id": "crowd-bar",
+   "name": "Bar",
+   "jp": "酒場",
+   "group": "hito",
+   "doodle": "glass",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Fourteen voices, short phrases, and a laugh every twenty seconds or so.",
+   "credit": null
+  },
+  {
+   "id": "crowd-market",
+   "name": "Market",
+   "jp": "市場",
+   "group": "hito",
+   "doodle": "market",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Open air, so nothing is muffled and the voices carry further apart.",
+   "credit": null
+  },
+  {
+   "id": "crowd-office",
+   "name": "Office",
+   "jp": "事務所",
+   "group": "hito",
+   "doodle": "desk",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Four people, mostly not talking, over a lot of air handling.",
+   "credit": null
+  },
+  {
+   "id": "crowd-lobby",
+   "name": "Through a Wall",
+   "jp": "隣室",
+   "group": "hito",
+   "doodle": "door",
+   "kind": "synth",
+   "defaultLevel": 0.45,
+   "note": "All the rhythm of speech and none of the consonants. The most useful of these for actually working.",
+   "credit": null
+  },
+  {
+   "id": "crowd-library",
+   "name": "Library",
+   "jp": "図書館",
+   "group": "hito",
+   "doodle": "book",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Two people who will say something roughly twice a minute, and otherwise the room itself.",
+   "credit": null
+  },
+  {
+   "id": "bowl",
+   "name": "Singing Bowl",
+   "jp": "鈴",
+   "group": "zen",
+   "doodle": "bowl",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Five inharmonic partials with staggered decays, struck about twice a minute.",
+   "credit": null
+  },
+  {
+   "id": "temple-bell",
+   "name": "Temple Bell",
+   "jp": "梵鐘",
+   "group": "zen",
+   "doodle": "bell",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Eight partials over a very low hum tone, the longest of them ringing for half a minute.",
+   "credit": null
+  },
+  {
+   "id": "gong",
+   "name": "Gong",
+   "jp": "銅鑼",
+   "group": "zen",
+   "doodle": "gong",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Twenty two inharmonic partials that bloom upward for a second or two after the strike before they fade.",
+   "credit": null
+  },
+  {
+   "id": "shishi-odoshi",
+   "name": "Shishi-odoshi",
+   "jp": "鹿威し",
+   "group": "zen",
+   "doodle": "bamboo",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "The bamboo fills, tips, knocks the stone, and pours itself out.",
+   "credit": null
+  },
+  {
+   "id": "flute",
+   "name": "Bamboo Flute",
+   "jp": "尺八",
+   "group": "zen",
+   "doodle": "flute",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Long notes from a minor pentatonic with wide silences. The breath across the edge is half the instrument.",
+   "credit": null
+  },
+  {
+   "id": "rainstick",
+   "name": "Rainstick",
+   "jp": "雨音筒",
+   "group": "zen",
+   "doodle": "rainstick",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Grains falling past pins, thinning out and then turned over again.",
+   "credit": null
+  },
+  {
+   "id": "drone-low",
+   "name": "Low Drone",
+   "jp": "低い響き",
+   "group": "zen",
+   "doodle": "drone",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Root, fifth and octave, detuned and drifting, so the beating never settles into a pattern.",
+   "credit": null
+  },
+  {
+   "id": "drone-high",
+   "name": "Open Drone",
+   "jp": "高い響き",
+   "group": "zen",
+   "doodle": "drone2",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "The same idea an octave up, where it stops being a floor and starts being a room.",
+   "credit": null
+  },
+  {
+   "id": "keyboard-soft",
+   "name": "Soft Keys",
+   "jp": "静音",
+   "group": "shitsu",
+   "doodle": "keyboard",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "A laptop board. Almost no switch, mostly the dull sound of the case taking the hit.",
+   "credit": null
+  },
+  {
+   "id": "keyboard-tactile",
+   "name": "Tactile Keys",
+   "jp": "打鍵",
+   "group": "shitsu",
+   "doodle": "keyboard2",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "A bump you can hear but not a click. The middle of the three, and the one most people actually type on.",
+   "credit": null
+  },
+  {
+   "id": "keyboard-clicky",
+   "name": "Clicky Keys",
+   "jp": "青軸",
+   "group": "shitsu",
+   "doodle": "keyboard3",
+   "kind": "synth",
+   "defaultLevel": 0.28,
+   "note": "Two clicks per press: the switch, then the click jacket an instant later, up at 5 kHz.",
+   "credit": null
+  },
+  {
+   "id": "keyboard-thock",
+   "name": "Thocky Keys",
+   "jp": "重打",
+   "group": "shitsu",
+   "doodle": "keyboard4",
+   "kind": "synth",
+   "defaultLevel": 0.32,
+   "note": "Low and round. The bottom-out is the loudest part, which is the whole point of the build.",
+   "credit": null
+  },
+  {
+   "id": "typewriter",
+   "name": "Typewriter",
+   "jp": "打字機",
+   "group": "shitsu",
+   "doodle": "typewriter",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "Hammers on a platen, a margin bell at the end of every line, and the carriage thrown back by hand.",
+   "credit": null
+  },
+  {
+   "id": "paper",
+   "name": "Writing",
+   "jp": "筆記",
+   "group": "shitsu",
+   "doodle": "pen",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "Short strokes with thinking pauses between them, and a page turned every half minute.",
+   "credit": null
+  },
+  {
+   "id": "clock",
+   "name": "Clock",
+   "jp": "時計",
+   "group": "shitsu",
+   "doodle": "clock",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "Tick and tock are different sounds. The escapement hits two different pallets, and a real pendulum is never quite even.",
+   "credit": null
+  },
+  {
+   "id": "fan",
+   "name": "Fan",
+   "jp": "扇風機",
+   "group": "shitsu",
+   "doodle": "fan",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Three detuned saws beating against each other under a bed of moving air.",
+   "credit": null
+  },
+  {
+   "id": "fridge",
+   "name": "Refrigerator",
+   "jp": "冷蔵庫",
+   "group": "shitsu",
+   "doodle": "fridge",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Mains hum and its harmonics over a motor that cycles on and off across several minutes.",
+   "credit": null
+  },
+  {
+   "id": "washing",
+   "name": "Washing Machine",
+   "jp": "洗濯機",
+   "group": "shitsu",
+   "doodle": "washing",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "The drum turns one way, pauses, and turns back. Everything else follows that.",
+   "credit": null
+  },
+  {
+   "id": "kettle",
+   "name": "Kettle",
+   "jp": "薬缶",
+   "group": "shitsu",
+   "doodle": "kettle",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "Forty bubbles a second against a resonant metal body, and steam on top.",
+   "credit": null
+  },
+  {
+   "id": "heartbeat",
+   "name": "Heartbeat",
+   "jp": "鼓動",
+   "group": "shitsu",
+   "doodle": "heart",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "Lub then dub, two valve closures rather than one beat, drifting with the breath between 52 and 72.",
+   "credit": null
+  },
+  {
+   "id": "cabin",
+   "name": "Cabin",
+   "jp": "機内",
+   "group": "tabi",
+   "doodle": "plane",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "The low, enveloping drone of being in transit with nowhere to be.",
+   "credit": null
+  },
+  {
+   "id": "train",
+   "name": "Train",
+   "jp": "列車",
+   "group": "tabi",
+   "doodle": "train",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Rail joints come in pairs because each carriage has two bogies, and the carriages are all the same length.",
+   "credit": null
+  },
+  {
+   "id": "traffic",
+   "name": "Traffic",
+   "jp": "車道",
+   "group": "tabi",
+   "doodle": "traffic",
+   "kind": "synth",
+   "defaultLevel": 0.35,
+   "note": "Each vehicle sweeps across the stereo field and brightens as it draws level with you.",
+   "credit": null
+  },
+  {
+   "id": "noise-white",
+   "name": "White",
+   "jp": "白",
+   "group": "oto",
+   "doodle": "white",
+   "kind": "synth",
+   "defaultLevel": 0.3,
+   "note": "Equal power at every frequency. The loudest-feeling of the colours.",
+   "credit": null
+  },
+  {
+   "id": "noise-pink",
+   "name": "Pink",
+   "jp": "桃",
+   "group": "oto",
+   "doodle": "pink",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Equal power per octave, which is what most people actually mean by white noise.",
+   "credit": null
+  },
+  {
+   "id": "noise-brown",
+   "name": "Brown",
+   "jp": "茶",
+   "group": "oto",
+   "doodle": "brown",
+   "kind": "synth",
+   "defaultLevel": 0.5,
+   "note": "Deeper still. Closest to a distant waterfall, and the kindest over long hours.",
+   "credit": null
+  },
+  {
+   "id": "noise-green",
+   "name": "Green",
+   "jp": "緑",
+   "group": "oto",
+   "doodle": "green",
+   "kind": "synth",
+   "defaultLevel": 0.4,
+   "note": "Energy gathered around 500 Hz, near the centre of hearing. Masks speech better than any of the others.",
+   "credit": null
+  },
+  {
+   "id": "noise-blue",
+   "name": "Blue",
+   "jp": "青",
+   "group": "oto",
+   "doodle": "blue",
+   "kind": "synth",
+   "defaultLevel": 0.25,
+   "note": "Tilted upward, all air. Good against a clattering keyboard, hard going for long.",
+   "credit": null
+  },
+  {
+   "id": "rec-crowd-cafe",
+   "name": "Cafe Room",
+   "jp": "喫茶店",
+   "group": "hito",
+   "doodle": "cafe",
+   "kind": "sample",
+   "defaultLevel": 0.45,
+   "note": "A real room with real people in it, recorded in Norway. The counterpart to the synthesised cafe above.",
+   "credit": "crowd-cafe"
+  },
+  {
+   "id": "rec-restaurant-chatter",
+   "name": "Restaurant Room",
+   "jp": "食堂",
+   "group": "hito",
+   "doodle": "plate",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "Recorded by Félix Blume, who spends his life pointing microphones at places.",
+   "credit": "restaurant-chatter"
+  },
+  {
+   "id": "rec-coffee-shop",
+   "name": "Coffee Shop",
+   "jp": "珈琲店",
+   "group": "hito",
+   "doodle": "cafe",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "Cups, the machine, and a low ceiling.",
+   "credit": "coffee-shop"
+  },
+  {
+   "id": "rec-market-bazaar",
+   "name": "Bazaar",
+   "jp": "市",
+   "group": "hito",
+   "doodle": "market",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "An open market in Palestine. Voices carry differently with no roof over them.",
+   "credit": "market-bazaar"
+  },
+  {
+   "id": "rec-library",
+   "name": "Library Room",
+   "jp": "図書館",
+   "group": "hito",
+   "doodle": "book",
+   "kind": "sample",
+   "defaultLevel": 0.45,
+   "note": "Mostly the building. Someone moves about once a minute.",
+   "credit": "library"
+  },
+  {
+   "id": "rec-church-interior",
+   "name": "Cathedral",
+   "jp": "聖堂",
+   "group": "zen",
+   "doodle": "bell",
+   "kind": "sample",
+   "defaultLevel": 0.45,
+   "note": "A very large stone room doing nothing at all, which turns out to be a sound.",
+   "credit": "church-interior"
+  },
+  {
+   "id": "rec-temple-bells",
+   "name": "Temple Bells",
+   "jp": "鐘",
+   "group": "zen",
+   "doodle": "bell",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "Recorded bronze, for when the synthesised bell is too clean.",
+   "credit": "temple-bells"
+  },
+  {
+   "id": "rec-wind-chimes",
+   "name": "Chimes Outside",
+   "jp": "風鈴",
+   "group": "kaze",
+   "doodle": "chime",
+   "kind": "sample",
+   "defaultLevel": 0.35,
+   "note": "Real tubes in a real garden, with the garden audible behind them.",
+   "credit": "wind-chimes"
+  },
+  {
+   "id": "rec-blizzard",
+   "name": "Blizzard Outside",
+   "jp": "猛吹雪",
+   "group": "kaze",
+   "doodle": "snow",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "The recorded version. Harsher and less even than the synthesised one.",
+   "credit": "blizzard"
+  },
+  {
+   "id": "rec-fireplace",
+   "name": "Fireplace",
+   "jp": "暖炉",
+   "group": "hi",
+   "doodle": "fire",
+   "kind": "sample",
+   "defaultLevel": 0.5,
+   "note": "A proper hearth with logs in it, two minutes of it.",
+   "credit": "fireplace"
+  },
+  {
+   "id": "rec-thunderstorm",
+   "name": "Thunderstorm",
+   "jp": "雷雨",
+   "group": "ame",
+   "doodle": "thunder",
+   "kind": "sample",
+   "defaultLevel": 0.45,
+   "note": "Rain and thunder together, as they actually arrive.",
+   "credit": "thunderstorm"
+  },
+  {
+   "id": "rec-harbour-seagulls",
+   "name": "Harbour",
+   "jp": "港",
+   "group": "mizu",
+   "doodle": "wave",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "Water against stone, boats, and gulls who have opinions.",
+   "credit": "harbour-seagulls"
+  },
+  {
+   "id": "rec-forest-brook",
+   "name": "Forest Brook",
+   "jp": "沢",
+   "group": "mori",
+   "doodle": "stream",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "A small stream with trees over it.",
+   "credit": "forest-brook"
+  },
+  {
+   "id": "rec-forest-night",
+   "name": "Forest at Night",
+   "jp": "夜の森",
+   "group": "mori",
+   "doodle": "owl",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "What a forest does when nobody is in it.",
+   "credit": "forest-night"
+  },
+  {
+   "id": "rec-birds-dawn",
+   "name": "Dawn Chorus",
+   "jp": "朝の鳥",
+   "group": "mori",
+   "doodle": "bird",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "The half hour before sunrise, when every bird decides to speak at once.",
+   "credit": "birds-dawn"
+  },
+  {
+   "id": "rec-birds-dawn-2",
+   "name": "Birds",
+   "jp": "鳥",
+   "group": "mori",
+   "doodle": "bird",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "A second chorus, further off and less busy.",
+   "credit": "birds-dawn-2"
+  },
+  {
+   "id": "rec-frogs-night",
+   "name": "Frogs at Night",
+   "jp": "夜の蛙",
+   "group": "mori",
+   "doodle": "frog",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "A real pond, which is messier than the synthesised one and better for it.",
+   "credit": "frogs-night"
+  },
+  {
+   "id": "rec-train-interior",
+   "name": "Train Carriage",
+   "jp": "車内",
+   "group": "tabi",
+   "doodle": "train",
+   "kind": "sample",
+   "defaultLevel": 0.45,
+   "note": "Inside a moving carriage. The joints are not as even as the synthesised ones.",
+   "credit": "train-interior"
+  },
+  {
+   "id": "rec-subway-station",
+   "name": "Subway Station",
+   "jp": "駅",
+   "group": "tabi",
+   "doodle": "train",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "Platform, tunnel, and the air they push ahead of them.",
+   "credit": "subway-station"
+  },
+  {
+   "id": "rec-city-street",
+   "name": "City Street",
+   "jp": "街",
+   "group": "tabi",
+   "doodle": "traffic",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "Traffic with buildings on both sides of it.",
+   "credit": "city-street"
+  },
+  {
+   "id": "rec-airport-terminal",
+   "name": "Airport",
+   "jp": "空港",
+   "group": "tabi",
+   "doodle": "desk",
+   "kind": "sample",
+   "defaultLevel": 0.4,
+   "note": "A terminal at Seattle. Announcements, distance, and nothing to do.",
+   "credit": "airport-terminal"
+  },
+  {
+   "id": "rec-airplane-cabin",
+   "name": "Airplane Cabin",
+   "jp": "機内",
+   "group": "tabi",
+   "doodle": "plane",
+   "kind": "sample",
+   "defaultLevel": 0.45,
+   "note": "The recorded cabin, with passengers in it.",
+   "credit": "airplane-cabin"
+  },
+  {
+   "id": "rec-pages-turning",
+   "name": "Pages",
+   "jp": "頁",
+   "group": "shitsu",
+   "doodle": "book",
+   "kind": "sample",
+   "defaultLevel": 0.3,
+   "note": "Someone else reading a physical book, slowly.",
+   "credit": "pages-turning"
+  },
+  {
+   "id": "rec-pencil-writing",
+   "name": "Pencil",
+   "jp": "鉛筆",
+   "group": "shitsu",
+   "doodle": "pen",
+   "kind": "sample",
+   "defaultLevel": 0.3,
+   "note": "Graphite on paper, which sounds nothing like a pen.",
+   "credit": "pencil-writing"
+  },
+  {
+   "id": "rec-clock-ticking",
+   "name": "Wall Clock",
+   "jp": "柱時計",
+   "group": "shitsu",
+   "doodle": "clock",
+   "kind": "sample",
+   "defaultLevel": 0.3,
+   "note": "A real escapement, with all the unevenness that implies.",
+   "credit": "clock-ticking"
+  },
+  {
+   "id": "rec-washing-machine",
+   "name": "Washer",
+   "jp": "洗濯",
+   "group": "shitsu",
+   "doodle": "washing",
+   "kind": "sample",
+   "defaultLevel": 0.35,
+   "note": "A full cycle, recorded from the next room.",
+   "credit": "washing-machine"
+  },
+  {
+   "id": "rec-refrigerator-hum",
+   "name": "Fridge Hum",
+   "jp": "冷蔵",
+   "group": "shitsu",
+   "doodle": "fridge",
+   "kind": "sample",
+   "defaultLevel": 0.35,
+   "note": "One compressor, running.",
+   "credit": "refrigerator-hum"
+  }
+ ],
+ "presets": [
+  {
+   "id": "study",
+   "name": "Deep Work",
+   "jp": "集中",
+   "blurb": "rain, a fan, and someone else typing",
+   "mix": {
+    "rain-window": 0.5,
+    "fan": 0.3,
+    "keyboard-tactile": 0.25
+   },
+   "music": null,
+   "theme": "kinari"
+  },
+  {
+   "id": "hearth",
+   "name": "Hearth",
+   "jp": "炉",
+   "blurb": "a fire going while it rains outside",
+   "mix": {
+    "fire": 0.6,
+    "rain-window": 0.35,
+    "thunder": 0.3,
+    "clock": 0.22
+   },
+   "music": null,
+   "theme": "sakura"
+  },
+  {
+   "id": "cafe",
+   "name": "Third Place",
+   "jp": "喫茶",
+   "blurb": "a cafe you are not expected to talk in",
+   "mix": {
+    "crowd-cafe": 0.5,
+    "rain-window": 0.3,
+    "paper": 0.25
+   },
+   "music": null,
+   "theme": "kinari"
+  },
+  {
+   "id": "temple",
+   "name": "Temple Garden",
+   "jp": "庭",
+   "blurb": "bamboo, bowl and a little wind",
+   "mix": {
+    "shishi-odoshi": 0.45,
+    "bowl": 0.35,
+    "wind": 0.25,
+    "stream": 0.3,
+    "temple-bell": 0.3
+   },
+   "music": null,
+   "theme": "matcha"
+  },
+  {
+   "id": "shore",
+   "name": "Shore",
+   "jp": "渚",
+   "blurb": "the sea doing what it always does",
+   "mix": {
+    "waves": 0.6,
+    "wind-high": 0.25,
+    "chimes": 0.2
+   },
+   "music": null,
+   "theme": "asagi"
+  },
+  {
+   "id": "night",
+   "name": "Late Night",
+   "jp": "深夜",
+   "blurb": "crickets, a far off storm, lofi underneath",
+   "mix": {
+    "crickets": 0.4,
+    "thunder": 0.25,
+    "rain-light": 0.3,
+    "frogs": 0.25
+   },
+   "music": {
+    "mode": "lofi",
+    "level": 0.45
+   },
+   "theme": "sumi"
+  },
+  {
+   "id": "transit",
+   "name": "In Transit",
+   "jp": "移動中",
+   "blurb": "a train, and the weather going past",
+   "mix": {
+    "train": 0.45,
+    "rain-window": 0.3,
+    "crowd-lobby": 0.25
+   },
+   "music": null,
+   "theme": "fuji"
+  },
+  {
+   "id": "summer",
+   "name": "Summer Afternoon",
+   "jp": "夏の午後",
+   "blurb": "cicadas, chimes, and nothing to do",
+   "mix": {
+    "cicadas": 0.35,
+    "chimes": 0.3,
+    "leaves": 0.35,
+    "wind-high": 0.2
+   },
+   "music": null,
+   "theme": "matcha"
+  },
+  {
+   "id": "forest",
+   "name": "Deep Forest",
+   "jp": "森",
+   "blurb": "a stream, leaves, and rain somewhere above",
+   "mix": {
+    "stream": 0.4,
+    "leaves": 0.4,
+    "rain-leaves": 0.35,
+    "owls": 0.25
+   },
+   "music": null,
+   "theme": "matcha"
+  },
+  {
+   "id": "quiet",
+   "name": "Nothing Much",
+   "jp": "静",
+   "blurb": "brown noise and a clock, for when anything else is too much",
+   "mix": {
+    "noise-brown": 0.45,
+    "clock": 0.25
+   },
+   "music": null,
+   "theme": "kinari"
+  },
+  {
+   "id": "cave",
+   "name": "Underground",
+   "jp": "洞",
+   "blurb": "drips in a hard empty space",
+   "mix": {
+    "cave-drip": 0.5,
+    "underwater": 0.3,
+    "drone-low": 0.3
+   },
+   "music": null,
+   "theme": "sumi"
+  },
+  {
+   "id": "nocturne",
+   "name": "Nocturne",
+   "jp": "夜想",
+   "blurb": "strings and a voice, over rain",
+   "mix": {
+    "rain-light": 0.35,
+    "fire": 0.3
+   },
+   "music": {
+    "mode": "lofi",
+    "level": 0.5
+   },
+   "theme": "fuji"
+  }
+ ],
+ "themes": [
+  {
+   "id": "sakura",
+   "name": "Sakura",
+   "jp": "桜",
+   "mood": "petals on still water",
+   "dark": false,
+   "colors": {
+    "paper": "#fdeff2",
+    "paper2": "#fbdbe2",
+    "paper3": "#fac1ce",
+    "ink": "#4a3540",
+    "inkSoft": "#65535c",
+    "line": "#f3b1bf",
+    "accent": "#d58fa6",
+    "accentText": "#913654",
+    "accent2": "#b0869f",
+    "wash": "#ead2da"
+   }
+  },
+  {
+   "id": "matcha",
+   "name": "Matcha",
+   "jp": "抹茶",
+   "mood": "tea whisked at dawn",
+   "dark": false,
+   "colors": {
+    "paper": "#eef3e4",
+    "paper2": "#e5edd5",
+    "paper3": "#d9e6c1",
+    "ink": "#39412f",
+    "inkSoft": "#576151",
+    "line": "#cfdcb4",
+    "accent": "#88a86f",
+    "accentText": "#4f663d",
+    "accent2": "#7eb3a0",
+    "wash": "#d2e0c7"
+   }
+  },
+  {
+   "id": "asagi",
+   "name": "Asagi",
+   "jp": "浅葱",
+   "mood": "shallow water, long morning",
+   "dark": false,
+   "colors": {
+    "paper": "#e9f3f4",
+    "paper2": "#daeced",
+    "paper3": "#c7e2e5",
+    "ink": "#2c4047",
+    "inkSoft": "#4f6269",
+    "line": "#bad8db",
+    "accent": "#5fa8b4",
+    "accentText": "#32646c",
+    "accent2": "#8aa9c4",
+    "wash": "#cadfe2"
+   }
+  },
+  {
+   "id": "kinari",
+   "name": "Kinari",
+   "jp": "生成",
+   "mood": "undyed linen, warm lamp",
+   "dark": false,
+   "colors": {
+    "paper": "#f7f2e7",
+    "paper2": "#f2e9d6",
+    "paper3": "#eddfc1",
+    "ink": "#423a2e",
+    "inkSoft": "#645b4f",
+    "line": "#e4d5b3",
+    "accent": "#bb9a63",
+    "accentText": "#725a32",
+    "accent2": "#a8886f",
+    "wash": "#e3daca"
+   }
+  },
+  {
+   "id": "fuji",
+   "name": "Fuji",
+   "jp": "藤",
+   "mood": "wisteria in the late afternoon",
+   "dark": false,
+   "colors": {
+    "paper": "#f0ecf6",
+    "paper2": "#e4ddef",
+    "paper3": "#d6cae8",
+    "ink": "#3b3550",
+    "inkSoft": "#59536f",
+    "line": "#cabcde",
+    "accent": "#9188c6",
+    "accentText": "#564a9b",
+    "accent2": "#b18fb9",
+    "wash": "#d1cee4"
+   }
+  },
+  {
+   "id": "sumi",
+   "name": "Sumi",
+   "jp": "墨",
+   "mood": "ink stone at midnight",
+   "dark": true,
+   "colors": {
+    "paper": "#1c1d24",
+    "paper2": "#23252e",
+    "paper3": "#2c2f3a",
+    "ink": "#ebe7dd",
+    "inkSoft": "#9a978f",
+    "line": "#3b3f4c",
+    "accent": "#7fb6bd",
+    "accentText": "#7fb6bd",
+    "accent2": "#c4a1a8",
+    "wash": "#2a2f3b"
+   }
+  }
+ ],
+ "defaultTheme": "kinari",
+ "credits": [
+  {
+   "id": "airplane-cabin",
+   "title": "amb, airplane cabin, passenger chatter, seatbelt announcement, fuma-bformat.wav",
+   "author": "drewhalasz",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/drewhalasz/sounds/433002/"
+  },
+  {
+   "id": "airport-terminal",
+   "title": "SeaTac Airport Terminal Ambience",
+   "author": "loganzsound",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/loganzsound/sounds/868379/"
+  },
+  {
+   "id": "birds-dawn",
+   "title": "Bird ambience. Coniferous forest dawn chorus.",
+   "author": "SamsterBirdies",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/SamsterBirdies/sounds/745273/"
+  },
+  {
+   "id": "birds-dawn-2",
+   "title": "Dawn Chorus Birdsong",
+   "author": "squashy555",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/squashy555/sounds/573080/"
+  },
+  {
+   "id": "blizzard",
+   "title": "blizzard looped.aif",
+   "author": "m0ments",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/m0ments/sounds/679941/"
+  },
+  {
+   "id": "church-interior",
+   "title": "Church HH.wav",
+   "author": "Henrythetrain",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/Henrythetrain/sounds/146397/"
+  },
+  {
+   "id": "city-street",
+   "title": "Urban commercial pedestrian street ambience",
+   "author": "lastraindrop",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/lastraindrop/sounds/716384/"
+  },
+  {
+   "id": "clock-ticking",
+   "title": "Clock Ticks (Loopable!)",
+   "author": "se2001",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/se2001/sounds/511967/"
+  },
+  {
+   "id": "coffee-shop",
+   "title": "Very Busy Coffee Shop Ambience",
+   "author": "wesleywestmusic",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/wesleywestmusic/sounds/680688/"
+  },
+  {
+   "id": "crowd-cafe",
+   "title": "A crowded café in Oslo",
+   "author": "lydgutten",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/lydgutten/sounds/774240/"
+  },
+  {
+   "id": "fireplace",
+   "title": "Fireplace crackling wood little flame.wav",
+   "author": "BonnyOrbit",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/BonnyOrbit/sounds/484338/"
+  },
+  {
+   "id": "forest-brook",
+   "title": "Small Forest Brook 01",
+   "author": "Irolan",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/Irolan/sounds/488324/"
+  },
+  {
+   "id": "forest-night",
+   "title": "Forest At Night Ambience",
+   "author": "fribergmusic2024",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/fribergmusic2024/sounds/719558/"
+  },
+  {
+   "id": "frogs-night",
+   "title": "Frogs and Cicadas at Night in Tennessee",
+   "author": "heyheymaimai",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/heyheymaimai/sounds/493066/"
+  },
+  {
+   "id": "harbour-seagulls",
+   "title": "Harbour_Seagulls_Day.WAV",
+   "author": "ivolipa",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/ivolipa/sounds/328808/"
+  },
+  {
+   "id": "library",
+   "title": "Quiet library ambience",
+   "author": "xkeril",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/xkeril/sounds/620683/"
+  },
+  {
+   "id": "market-bazaar",
+   "title": "Evening Bazaar Ambience at Souq Al Bashorah, Ramallah, Palestine",
+   "author": "sounds_from_palestine",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/sounds_from_palestine/sounds/819223/"
+  },
+  {
+   "id": "pages-turning",
+   "title": "turning pages in book.wav",
+   "author": "P_Chester",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/P_Chester/sounds/465260/"
+  },
+  {
+   "id": "pencil-writing",
+   "title": "Writing - pencil on paper",
+   "author": "magnus1906",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/magnus1906/sounds/513938/"
+  },
+  {
+   "id": "refrigerator-hum",
+   "title": "Refrigerator Hum",
+   "author": "adamdavidsmith",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/adamdavidsmith/sounds/877268/"
+  },
+  {
+   "id": "restaurant-chatter",
+   "title": "Restaurant Atmosphere (crowded)",
+   "author": "felix.blume",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/felix.blume/sounds/422097/"
+  },
+  {
+   "id": "subway-station",
+   "title": "Underground Train Station Ambience",
+   "author": "florianreichelt",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/florianreichelt/sounds/451720/"
+  },
+  {
+   "id": "temple-bells",
+   "title": "temple bells.wav",
+   "author": "Paresh",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/Paresh/sounds/423401/"
+  },
+  {
+   "id": "thunderstorm",
+   "title": "Heavy_Thunderstorm_with_Rain.wav",
+   "author": "Audeption",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/Audeption/sounds/698811/"
+  },
+  {
+   "id": "train-interior",
+   "title": "AMBIENCE_INTERIOR_TRAIN_PORTUGAL_INTERCIDADES_4824_03",
+   "author": "pblzr",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/pblzr/sounds/785398/"
+  },
+  {
+   "id": "washing-machine",
+   "title": "washing machine 01",
+   "author": "oliwoli",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/oliwoli/sounds/548461/"
+  },
+  {
+   "id": "wind-chimes",
+   "title": "Wind chimes 1",
+   "author": "giddster",
+   "license": "CC0 1.0",
+   "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+   "sourceUrl": "https://freesound.org/people/giddster/sounds/437337/"
+  }
+ ]
+}

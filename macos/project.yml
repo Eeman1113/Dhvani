@@ -1,0 +1,70 @@
+# The Dhvani macOS app. Generate the Xcode project with:
+#
+#   cd macos && xcodegen
+#
+# Everything under Resources/Engine and the doodles in Assets.xcassets are
+# built from the website by `npm run mac:assets`; the audio files and painted
+# art are taken straight from ../public.
+
+name: Dhvani
+options:
+  bundleIdPrefix: app.dhvani
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "6.0"
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    SWIFT_APPROACHABLE_CONCURRENCY: YES
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_STYLE: Manual
+    ENABLE_HARDENED_RUNTIME: YES
+    ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+targets:
+  Dhvani:
+    type: application
+    platform: macOS
+    sources:
+      - path: Dhvani/Sources
+      - path: Dhvani/Resources/Assets.xcassets
+      - path: Dhvani/Resources/AppIcon.icon
+      - path: Dhvani/Resources/Engine
+        type: folder
+        buildPhase: resources
+      - path: Dhvani/Resources/Fonts
+        type: folder
+        buildPhase: resources
+      - path: ../public/audio
+        type: folder
+        buildPhase: resources
+      - path: ../public/art
+        type: folder
+        buildPhase: resources
+    info:
+      path: Dhvani/Info.plist
+      properties:
+        CFBundleDisplayName: Dhvani
+        CFBundleName: Dhvani
+        LSApplicationCategoryType: public.app-category.music
+        # A menu bar app first. The Dock icon is a setting, applied at launch.
+        LSUIElement: true
+        NSHumanReadableCopyright: "Synthesis code MIT. Field recordings CC0, credited in the app."
+    entitlements:
+      path: Dhvani/Dhvani.entitlements
+      properties:
+        com.apple.security.app-sandbox: true
+        # WebKit runs the engine out of process and needs this to start.
+        com.apple.security.network.client: true
+        # Importing and exporting presets through the open and save panels.
+        com.apple.security.files.user-selected.read-write: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.dhvani.mac
+        PRODUCT_NAME: Dhvani
+        GENERATE_INFOPLIST_FILE: NO
