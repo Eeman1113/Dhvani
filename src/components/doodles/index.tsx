@@ -28,3 +28,23 @@ export function Doodle({ name, active }: { name: string; active: boolean; id?: s
 }
 
 export const DOODLE_NAMES = Object.keys(ICON_PATHS);
+
+/**
+ * Every icon as a component, keyed by name.
+ *
+ * The web app only ever needs `Doodle`, but the macOS app in `macos/` is a
+ * second consumer of this module: `scripts/build-mac.mjs` renders each of
+ * these to static markup, strips the boil down to one frame and ships them
+ * as template images for the menu bar. Removing this export silently breaks
+ * that build, which is exactly what happened once, so it is part of the
+ * public surface of this file and not an accident.
+ */
+export const DOODLES: Record<string, React.FC<{ active: boolean; id?: string }>> =
+  Object.fromEntries(
+    Object.keys(ICON_PATHS).map((name) => [
+      name,
+      function DoodleIcon({ active }: { active: boolean; id?: string }) {
+        return <Icon name={name} active={active} />;
+      },
+    ]),
+  );
