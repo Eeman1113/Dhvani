@@ -165,6 +165,11 @@ function still(svg) {
     .replace(/(stroke|fill)="var\(--accent(?:-2)?\)"/g, '$1="#000" $1-opacity="0.55"')
     .replace(/(stroke|fill)="var\(--(?:ink|ink-soft)\)"/g, '$1="#000"')
     .replace(/(stroke|fill)="var\(--(?:paper|paper-2|paper-3|wash|line)\)"/g, '$1="none"')
+    // The traced icons paint with currentColor, which inherits from the page
+    // on the site and means nothing in a standalone asset. Xcode treats these
+    // as template images, so the colour only has to be opaque, but leaving it
+    // undefined is not worth the risk.
+    .replace(/(stroke|fill)="currentColor"/g, '$1="#000"')
     .replace(/var\(--[a-z0-9-]+\)/g, "#000")
     .replace(/viewBox="0 0 64 64"/, 'viewBox="-6 -6 76 76" width="76" height="76"')
     .replace(/ aria-hidden="true"/, ' xmlns="http://www.w3.org/2000/svg"');
