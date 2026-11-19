@@ -196,7 +196,14 @@ struct LevelSlider: View {
     var onChange: @MainActor @Sendable (Double) -> Void
 
     var body: some View {
-        Slider(value: Binding(get: { value }, set: onChange), in: 0...1)
+        // The closure is wrapped rather than passed straight to `set:`.
+        //
+        // Handing Binding a bare `@MainActor @Sendable (Double) -> Void`
+        // makes the compiler build an @isolated(any) reabstraction thunk,
+        // and swift-frontend 6.2 crashes emitting IR for it, in both Debug
+        // and Release. Calling it from inside a closure is the same thing
+        // semantically and gives the compiler nothing to reabstract.
+        Slider(value: Binding(get: { value }, set: { onChange($0) }), in: 0...1)
             .controlSize(.small)
             .accessibilityLabel(label)
             .accessibilityValue("\(Int(value * 100)) percent")
