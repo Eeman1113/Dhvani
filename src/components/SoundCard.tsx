@@ -105,7 +105,11 @@ export function SoundCard({ sound, index }: { sound: Sound; index: number }) {
         <button
           type="button"
           onClick={() => setShowNote((v) => !v)}
-          className="tap-sq absolute right-0 top-0 z-10 rounded-full text-[0.72rem] leading-none transition-opacity"
+          // 28, not the 44 the other touch targets use. At 44 this square
+          // covered the top-right corner of the card including part of the
+          // doodle, so a tap meant to turn the sound on opened the note
+          // instead, depending on exactly where it landed.
+          className="absolute right-0.5 top-0.5 z-20 flex h-7 w-7 items-center justify-center rounded-full text-[0.72rem] leading-none transition-opacity"
           style={{ color: "var(--ink-soft)", opacity: showNote ? 1 : 0.35 }}
           aria-label={`How ${sound.name} is made`}
           aria-expanded={showNote}

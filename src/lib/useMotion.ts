@@ -15,6 +15,37 @@ import { getTier } from "./perf";
 
 type Band = "bass" | "mid" | "air" | "rms";
 
+/**
+ * Nothing moves while a finger is down.
+ *
+ * Safari on iOS cancels a tap if the element under the finger shifts between
+ * touchstart and touchend, and every card here is continuously lifting,
+ * tilting and scaling with the music. A playing card moves the most, which is
+ * why turning one off was the least reliable thing in the app and why it felt
+ * random rather than broken: whether the tap registered depended on what the
+ * bass was doing at that moment.
+ *
+ * One flag, set on the window, read by every motion loop. A tap lasts a
+ * couple of hundred milliseconds and nobody notices the page holding still
+ * for it; everybody notices a button that does not respond.
+ */
+let pointerHeld = false;
+
+if (typeof window !== "undefined") {
+  const down = () => {
+    pointerHeld = true;
+  };
+  const up = () => {
+    pointerHeld = false;
+  };
+  window.addEventListener("pointerdown", down, { passive: true, capture: true });
+  window.addEventListener("pointerup", up, { passive: true, capture: true });
+  window.addEventListener("pointercancel", up, { passive: true, capture: true });
+  // A pointerup that lands outside the window never fires, so this is the
+  // backstop that stops the page freezing for good.
+  window.addEventListener("blur", up);
+}
+
 export type MotionOpts = {
   /** Only react while the sound this belongs to is actually playing. */
   active?: boolean;
@@ -60,6 +91,8 @@ export function useMotion<T extends SVGElement | HTMLElement>(opts: MotionOpts =
     let t = 0;
 
     const step = (l: Levels, dt: number) => {
+      // Hold still while something is being tapped or dragged.
+      if (pointerHeld) return;
       const c = o.current;
       t += dt;
       const band = c.band ?? "rms";
