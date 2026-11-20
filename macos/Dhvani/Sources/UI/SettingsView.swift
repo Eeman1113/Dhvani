@@ -387,6 +387,28 @@ private struct AboutSettings: View {
                 .padding(.vertical, 8)
             }
             Section {
+                VStack(alignment: .leading, spacing: 2) {
+                    Link(destination: URL(string: "https://github.com/Eeman1113")!) {
+                        Text("Dhvani is made by **Eeman Majumder**")
+                    }
+                    Text("The synthesis, the generative music, the drawing system and everything else here, except where noted below.")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+                HStack(alignment: .top, spacing: 12) {
+                    Image("Logo").renderingMode(.template).resizable().scaledToFit().frame(height: 30)
+                        .foregroundStyle(paper.ink)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Link(destination: URL(string: "https://www.linkedin.com/in/sakshi-sawarkar/")!) {
+                            Text("Logo by **Sakshi Sawarkar**")
+                        }
+                        Text("The word ध्वनि in her own handwriting, written in felt tip on a sheet of paper, photographed, cut out of its background and traced to vector. The waver in the shirorekha is hers, and not a letterform has been corrected.")
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                }
+            } header: {
+                Text("Who made it 作")
+            }
+            Section {
                 ForEach(model.catalogue.credits) { c in
                     VStack(alignment: .leading, spacing: 2) {
                         Text(model.catalogue.sounds.first { $0.credit == c.id }?.name ?? c.title).font(.body)

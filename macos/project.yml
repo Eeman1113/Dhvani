@@ -54,7 +54,7 @@ targets:
         LSApplicationCategoryType: public.app-category.music
         # A menu bar app first. The Dock icon is a setting, applied at launch.
         LSUIElement: true
-        NSHumanReadableCopyright: "Synthesis code MIT. Field recordings CC0, credited in the app."
+        NSHumanReadableCopyright: "Made by Eeman Majumder. Code MIT. Logo by Sakshi Sawarkar, used with permission. Field recordings CC0, credited in the app."
     entitlements:
       path: Dhvani/Dhvani.entitlements
       properties:
